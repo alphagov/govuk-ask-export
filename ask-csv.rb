@@ -32,6 +32,7 @@ QUESTION_FIELD = "Q11288904"
 EMAIL_FIELD = "Q11289069"
 REGION_FIELD = "Q11312915"
 PHONE_FIELD = "Q11312922"
+QUESTION_FORMAT_FIELD = "Q11324295"
 
 smart_survey_export = ARGV.pop
 
@@ -48,7 +49,8 @@ CSV.foreach(smart_survey_export, headers: true, encoding: "bom|utf-8") do |csv|
     QUESTION_FIELD,
     EMAIL_FIELD,
     REGION_FIELD,
-    PHONE_FIELD
+    PHONE_FIELD,
+    QUESTION_FORMAT_FIELD,
   ].any? { |f| csv[f].nil? }
 
   raise "Missing expected fields" if missing_fields
@@ -63,12 +65,14 @@ CSV.foreach(smart_survey_export, headers: true, encoding: "bom|utf-8") do |csv|
                           region: csv[REGION_FIELD],
                           name: csv[NAME_FIELD],
                           email: csv[EMAIL_FIELD],
-                          phone: csv[PHONE_FIELD] }
+                          phone: csv[PHONE_FIELD],
+                          question_format: csv[QUESTION_FORMAT_FIELD] }
 
   third_party_csv << { id: csv["UserID"],
                        submission_time: csv["Ended"],
                        region: csv[REGION_FIELD],
-                       question: csv[QUESTION_FIELD] }
+                       question: csv[QUESTION_FIELD],
+                       question_format: csv[QUESTION_FORMAT_FIELD] }
 end
 
 def write_csv(path, data)
