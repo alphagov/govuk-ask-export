@@ -80,5 +80,5 @@ end
 
 date = Date.today.to_s
 
-write_csv("cabinet-office-#{date}.csv", cabinet_office_csv)
-write_csv("third-party-#{date}.csv", third_party_csv)
+write_csv("#{date}-cabinet-office.csv", cabinet_office_csv)
+write_csv("#{date}-third-party.csv", third_party_csv)
