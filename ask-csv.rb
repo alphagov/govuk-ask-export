@@ -2,9 +2,9 @@
 
 # Usage `ruby ask-csv.rb <smart-survey-export>`
 #
-# This converts an exported Smart Survey into 3 files: one for GOV.UK analytics
-# to track user journeys, one to be sent to Cabinet Office and one to be sent
-# to the third party who picks the questions
+# This converts an exported Smart Survey into 2 files:
+# - one to be sent to Cabinet Office
+# - one to be sent to the third party who picks the questions
 #
 # The survey should be exported by following these steps
 #
@@ -32,10 +32,10 @@ QUESTION_FIELD = "Q11288904"
 EMAIL_FIELD = "Q11289069"
 REGION_FIELD = "Q11312915"
 PHONE_FIELD = "Q11312922"
+QUESTION_FORMAT_FIELD = "Q11324295"
 
 smart_survey_export = ARGV.pop
 
-govuk_analaytics_csv = []
 cabinet_office_csv = []
 third_party_csv = []
 
@@ -48,27 +48,25 @@ CSV.foreach(smart_survey_export, headers: true, encoding: "bom|utf-8") do |csv|
     QUESTION_FIELD,
     EMAIL_FIELD,
     REGION_FIELD,
-    PHONE_FIELD
+    PHONE_FIELD,
+    QUESTION_FORMAT_FIELD,
   ].any? { |f| csv[f].nil? }
 
   raise "Missing expected fields" if missing_fields
-
-  govuk_analaytics_csv << { start_time: csv["Started"],
-                            end_time: csv["Ended"],
-                            client_id: csv["clientID"],
-                            page_path: csv["Page Path"] }
 
   cabinet_office_csv << { id: csv["UserID"],
                           submission_time: csv["Ended"],
                           region: csv[REGION_FIELD],
                           name: csv[NAME_FIELD],
                           email: csv[EMAIL_FIELD],
-                          phone: csv[PHONE_FIELD] }
+                          phone: csv[PHONE_FIELD],
+                          question_format: csv[QUESTION_FORMAT_FIELD] }
 
   third_party_csv << { id: csv["UserID"],
                        submission_time: csv["Ended"],
                        region: csv[REGION_FIELD],
-                       question: csv[QUESTION_FIELD] }
+                       question: csv[QUESTION_FIELD],
+                       question_format: csv[QUESTION_FORMAT_FIELD] }
 end
 
 def write_csv(path, data)
@@ -82,6 +80,5 @@ end
 
 date = Date.today.to_s
 
-write_csv("govuk-analytics-#{date}.csv", govuk_analaytics_csv)
-write_csv("cabinet-office-#{date}.csv", cabinet_office_csv)
-write_csv("third-party-#{date}.csv", third_party_csv)
+write_csv("#{date}-cabinet-office.csv", cabinet_office_csv)
+write_csv("#{date}-third-party.csv", third_party_csv)
