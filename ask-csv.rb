@@ -19,8 +19,8 @@
 # - In the filters tab:
 #   - Turn on "Select custom filter" and choose "Completed Over 18 Responses"
 #   - Go to the "Date range" field and select "Custom range"
-#     then adjust the "From" time to be 12pm on the previous day and
-#     the "To" time to be 12pm on the current day
+#     then adjust the "From" time to be 10am on the previous day and
+#     the "To" time to be 10am on the current day
 # - Click "Export" and wait for the report to be generated, then click the
 #   download link to save the file
 
