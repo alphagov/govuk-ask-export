@@ -2,6 +2,9 @@ require "active_support"
 require "active_support/time"
 Time.zone = "Europe/London"
 
+require_relative "ask_export/csv_builder"
+require_relative "ask_export/csv_splitter"
+
 module AskExport
   CONFIG = {
     draft: {

@@ -1,0 +1,14 @@
+require "climate_control"
+require "rake"
+require "active_support/testing/time_helpers"
+require "ask_export"
+
+Dir["#{__dir__}/support/**/*.rb"].sort.each { |f| require f }
+Rake.application.load_rakefile
+
+RSpec.configure do |config|
+  include ActiveSupport::Testing::TimeHelpers
+  include AskExportHelper
+
+  config.disable_monkey_patching!
+end
