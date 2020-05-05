@@ -1,3 +1,7 @@
+require "active_support"
+require "active_support/time"
+Time.zone = "Europe/London"
+
 module AskExport
   CONFIG = {
     draft: {

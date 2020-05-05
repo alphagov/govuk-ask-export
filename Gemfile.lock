@@ -66,6 +66,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   rake
   rspec
   rubocop-govuk
