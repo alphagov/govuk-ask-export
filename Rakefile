@@ -9,7 +9,7 @@ task default: %w[rubocop spec]
 
 desc "Run the process to export questions and send them to stakeholders"
 task :export do
-  # to do...
+  AskExport::Runner.call
 end
 
 desc "Split a Smart Survey CSV into files for each partner, available as a fallback if export fails"
