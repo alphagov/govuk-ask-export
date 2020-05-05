@@ -27,6 +27,10 @@ module AskExport
       upload_to_s3("third-party/#{Date.current}.csv", csv.third_party)
 
       puts "Files uploaded to S3"
+
+      PartnerNotifier.call(since_time, until_time, responses.count)
+
+      puts "Partners have been notified"
     end
 
     private_class_method :new

@@ -7,6 +7,9 @@ RSpec.describe "Automatic export" do
       AWS_SECRET_ACCESS_KEY: "secret",
       AWS_REGION: "eu-west-1",
       S3_BUCKET: "bucket",
+      NOTIFY_API_KEY: "#{SecureRandom.uuid}-#{SecureRandom.uuid}",
+      CABINET_OFFICE_EMAIL_RECIPIENTS: "test@example.com",
+      THIRD_PARTY_EMAIL_RECIPIENTS: "test@example.com",
     ) { example.run }
   end
 
@@ -23,9 +26,15 @@ RSpec.describe "Automatic export" do
     stub_request(:put, /bucket\.s3\.eu-west-1\.amazonaws\.com/)
   end
 
+  let!(:notify_request) do
+    stub_request(:post, /api\.notifications\.service\.gov\.uk/)
+      .and_return(body: "{}")
+  end
+
   it "fetches surveys and uploads them to s3" do
     Rake::Task["export"].invoke
     expect(smart_survey_request).to have_been_made
     expect(s3_request).to have_been_made.twice
+    expect(notify_request).to have_been_made.twice
   end
 end

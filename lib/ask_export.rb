@@ -4,6 +4,7 @@ Time.zone = "Europe/London"
 
 require_relative "ask_export/csv_builder"
 require_relative "ask_export/csv_splitter"
+require_relative "ask_export/partner_notifier"
 require_relative "ask_export/runner"
 require_relative "ask_export/survey_response_fetcher"
 

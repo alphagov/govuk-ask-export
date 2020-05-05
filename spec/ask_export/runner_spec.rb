@@ -17,6 +17,7 @@ RSpec.describe AskExport::Runner do
       before do
         allow(AskExport::SurveyResponseFetcher).to receive(:call).and_return(responses)
         allow(Aws::S3::Resource).to receive(:new).and_return(s3_resource_stub)
+        allow(AskExport::PartnerNotifier).to receive(:call)
       end
 
       let(:responses) { [presented_survey_response] }
@@ -50,6 +51,13 @@ RSpec.describe AskExport::Runner do
                                        .with(bucket: s3_bucket,
                                              key: "#{s3_path_prefix}third-party/2020-05-01.csv",
                                              body: "third-party-data")
+        described_class.call
+      end
+
+      it "notifies partners with the times and number of responses" do
+        expect(AskExport::PartnerNotifier)
+          .to receive(:call)
+          .with(since_time, until_time, responses.count)
         described_class.call
       end
     end

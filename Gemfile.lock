@@ -38,8 +38,11 @@ GEM
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.4)
     jmespath (1.4.0)
+    jwt (2.2.1)
     minitest (5.14.0)
     multipart-post (2.1.1)
+    notifications-ruby-client (5.1.2)
+      jwt (>= 1.5, < 3)
     parallel (1.19.1)
     parser (2.7.1.2)
       ast (~> 2.4.0)
@@ -102,6 +105,7 @@ DEPENDENCIES
   aws-sdk-s3
   climate_control
   faraday
+  notifications-ruby-client
   rake
   rspec
   rubocop-govuk
