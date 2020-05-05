@@ -1,3 +1,5 @@
+require "aws-sdk-s3"
+
 module AskExport
   class Runner
     def self.call
@@ -18,6 +20,13 @@ module AskExport
       end
 
       puts "#{responses.count} total responses from #{since_time} until #{until_time}"
+
+      csv = CsvBuilder.new(responses)
+
+      upload_to_s3("cabinet-office/#{Date.current}.csv", csv.cabinet_office)
+      upload_to_s3("third-party/#{Date.current}.csv", csv.third_party)
+
+      puts "Files uploaded to S3"
     end
 
     private_class_method :new
@@ -25,5 +34,12 @@ module AskExport
   private
 
     attr_reader :since_time, :until_time
+
+    def upload_to_s3(key, data)
+      client = Aws::S3::Resource.new.client
+      client.put_object(bucket: ENV.fetch("S3_BUCKET"),
+                        key: ENV.fetch("S3_PATH_PREFIX", "") + key,
+                        body: data)
+    end
   end
 end
