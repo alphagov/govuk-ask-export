@@ -1,4 +1,4 @@
-RSpec.describe "Automatic export" do
+RSpec.describe "S3 export" do
   around do |example|
     ClimateControl.modify(
       SMART_SURVEY_API_TOKEN: "token",
@@ -32,7 +32,7 @@ RSpec.describe "Automatic export" do
   end
 
   it "fetches surveys and uploads them to s3" do
-    Rake::Task["export"].invoke
+    Rake::Task["s3_export"].invoke
     expect(smart_survey_request).to have_been_made
     expect(s3_request).to have_been_made.twice
     expect(notify_request).to have_been_made.twice

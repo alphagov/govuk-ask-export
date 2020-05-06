@@ -5,8 +5,8 @@ module AskExport
   class SurveyResponseFetcher
     RESPONSES_PER_REQUEST = 100
 
-    def self.call(*args, &block)
-      new(*args).call(&block)
+    def self.call(*args)
+      new(*args).call
     end
 
     def initialize(since_time, until_time)
@@ -15,6 +15,8 @@ module AskExport
     end
 
     def call
+      raise "Too early, submissions for today are still open" if until_time > Time.zone.now
+
       page = 1
       responses = []
       loop do
@@ -33,7 +35,7 @@ module AskExport
         responses += body.filter { |entry| entry[:status] == "completed" }
                          .map { |entry| ResultPresenter.call(entry) }
 
-        yield responses.count if block_given?
+        puts "downloaded #{responses.count} completed responses"
 
         break if body.length < RESPONSES_PER_REQUEST
 
@@ -43,6 +45,7 @@ module AskExport
         page += 1
       end
 
+      puts "#{responses.count} total completed responses from #{since_time} until #{until_time}"
       responses
     end
 

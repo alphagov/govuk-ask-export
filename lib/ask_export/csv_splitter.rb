@@ -14,19 +14,14 @@ module AskExport
     def call
       responses = []
       CSV.foreach(input_path, headers: true, encoding: "bom|utf-8") do |row|
-        next if row["UserID"].empty?
+        next if row["UserID"].empty? || fetch_answer(row, :over_18_field_id) != "Yes"
 
         responses << present_response(row)
       end
 
       puts "There were #{responses.count} responses retrieved from the input CSV"
 
-      builder = CsvBuilder.new(responses)
-      File.write(cabinet_office_path, builder.cabinet_office, mode: "w")
-      File.write(third_party_path, builder.third_party, mode: "w")
-
-      puts "CSV files have been output to #{relative_to_cwd(cabinet_office_path)} " \
-        "and #{relative_to_cwd(third_party_path)}"
+      OutputFileWriter.call(DailyReport.new(responses))
     end
 
   private
@@ -48,25 +43,6 @@ module AskExport
 
     def fetch_answer(row, field_id)
       row["Q#{AskExport.config(field_id)}"]
-    end
-
-    def cabinet_office_path
-      "#{output_directory}/#{Date.current}-cabinet-office.csv"
-    end
-
-    def third_party_path
-      "#{output_directory}/#{Date.current}-third-party.csv"
-    end
-
-    def output_directory
-      ENV.fetch(
-        "OUTPUT_DIR",
-        File.expand_path("../../output", __dir__),
-      )
-    end
-
-    def relative_to_cwd(path)
-      Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd))
     end
   end
 end
