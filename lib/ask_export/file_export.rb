@@ -7,11 +7,11 @@ module AskExport
     end
 
     def initialize
-      @daily_report = DailyReport.new
+      @report = Report.new
     end
 
     def call
-      csv_builder = CsvBuilder.new(daily_report)
+      csv_builder = CsvBuilder.new(report)
 
       File.write(cabinet_office_path, csv_builder.cabinet_office, mode: "w")
       File.write(third_party_path, csv_builder.third_party, mode: "w")
@@ -24,14 +24,14 @@ module AskExport
 
   private
 
-    attr_reader :daily_report
+    attr_reader :report
 
     def cabinet_office_path
-      "#{output_directory}/#{daily_report.until_time.to_date}-cabinet-office.csv"
+      "#{output_directory}/#{report.until_time.to_date}-cabinet-office.csv"
     end
 
     def third_party_path
-      "#{output_directory}/#{daily_report.until_time.to_date}-third-party.csv"
+      "#{output_directory}/#{report.until_time.to_date}-third-party.csv"
     end
 
     def output_directory

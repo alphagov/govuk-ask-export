@@ -1,5 +1,5 @@
 module AskExport
-  class DailyReport
+  class Report
     attr_reader :since_time, :until_time
 
     def initialize

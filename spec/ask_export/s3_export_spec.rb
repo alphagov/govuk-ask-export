@@ -17,7 +17,7 @@ RSpec.describe AskExport::S3Export do
   let(:s3_resource_stub) { Aws::S3::Resource.new(stub_responses: true) }
 
   before do
-    allow(AskExport::DailyReport).to receive(:new).and_return(stubbed_daily_report)
+    allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
     allow(Aws::S3::Resource).to receive(:new).and_return(s3_resource_stub)
     allow(AskExport::PartnerNotifier).to receive(:call)
   end

@@ -1,4 +1,4 @@
-RSpec.describe AskExport::DailyReport do
+RSpec.describe AskExport::Report do
   around do |example|
     travel_to(Time.zone.parse("2020-05-01 12:00")) { example.run }
   end
