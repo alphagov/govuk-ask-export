@@ -84,7 +84,7 @@ RSpec.describe AskExport::SurveyResponseFetcher do
     context "unsuccessful retrivals" do
       it "raises an error if until time is after the current time" do
         expect { described_class.call(since_time, Time.zone.now + 60) }
-          .to raise_error("Too early, submissions for today are still open")
+          .to raise_error(ArgumentError, "Too early, submissions for today are still open")
       end
 
       it "retries 429 responses 3 times before raising an error" do

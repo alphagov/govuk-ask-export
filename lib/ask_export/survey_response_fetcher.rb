@@ -15,7 +15,9 @@ module AskExport
     end
 
     def call
-      raise "Too early, submissions for today are still open" if until_time > Time.zone.now
+      if until_time > Time.zone.now
+        raise ArgumentError, "You are requesting an export for future data"
+      end
 
       page = 1
       responses = []
