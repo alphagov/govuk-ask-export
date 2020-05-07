@@ -15,6 +15,10 @@ module AskExport
     end
 
     def call
+      if since_time >= until_time
+        raise ArgumentError, "Export since time must be before the until time"
+      end
+
       if until_time > Time.zone.now
         raise ArgumentError, "You are requesting an export for future data"
       end
