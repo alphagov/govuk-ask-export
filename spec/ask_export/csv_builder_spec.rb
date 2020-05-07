@@ -9,7 +9,7 @@ RSpec.describe AskExport::CsvBuilder do
   describe "#cabinet_office" do
     context "when there are no responses" do
       it "returns a csv string of the headers" do
-        builder = described_class.new([])
+        builder = described_class.new(stubbed_daily_report(responses: []))
         expect(builder.cabinet_office)
           .to eq("id,submission_time,region,name,email,phone,question_format\n")
       end
@@ -17,7 +17,7 @@ RSpec.describe AskExport::CsvBuilder do
 
     context "when there are responses" do
       it "returns a csv of cabinet office data" do
-        builder = described_class.new(responses)
+        builder = described_class.new(stubbed_daily_report(responses: responses))
         expect(builder.cabinet_office).to eq(
           "id,submission_time,region,name,email,phone,question_format\n" \
           "1,2020-05-01T09:00:00+01:00,Scotland,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n" \
@@ -30,7 +30,7 @@ RSpec.describe AskExport::CsvBuilder do
   describe "#third_party" do
     context "when there are no responses" do
       it "returns a csv string of the headers" do
-        builder = described_class.new([])
+        builder = described_class.new(stubbed_daily_report(responses: []))
         expect(builder.third_party)
           .to eq("id,submission_time,region,question,question_format\n")
       end
@@ -38,7 +38,7 @@ RSpec.describe AskExport::CsvBuilder do
 
     context "when there are responses" do
       it "returns a csv of cabinet office data" do
-        builder = described_class.new(responses)
+        builder = described_class.new(stubbed_daily_report(responses: responses))
         expect(builder.third_party).to eq(
           "id,submission_time,region,question,question_format\n" \
           "1,2020-05-01T09:00:00+01:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n" \

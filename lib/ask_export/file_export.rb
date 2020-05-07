@@ -11,7 +11,7 @@ module AskExport
     end
 
     def call
-      csv_builder = CsvBuilder.new(daily_report.responses)
+      csv_builder = CsvBuilder.new(daily_report)
 
       File.write(cabinet_office_path, csv_builder.cabinet_office, mode: "w")
       File.write(third_party_path, csv_builder.third_party, mode: "w")

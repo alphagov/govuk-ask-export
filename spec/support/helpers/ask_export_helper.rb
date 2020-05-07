@@ -90,10 +90,10 @@ module AskExportHelper
     }
   end
 
-  def stubbed_daily_report
+  def stubbed_daily_report(responses: [presented_survey_response])
     daily_report = AskExport::DailyReport.new
     allow(daily_report).to receive(:responses)
-                       .and_return([presented_survey_response])
+                       .and_return(responses)
     daily_report
   end
 

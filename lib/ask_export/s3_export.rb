@@ -11,16 +11,14 @@ module AskExport
     end
 
     def call
-      csv_builder = CsvBuilder.new(daily_report.responses)
+      csv_builder = CsvBuilder.new(daily_report)
 
       upload_to_s3("cabinet-office/#{daily_report.until_time.to_date}.csv", csv_builder.cabinet_office)
       upload_to_s3("third-party/#{daily_report.until_time.to_date}.csv", csv_builder.third_party)
 
       puts "Files uploaded to S3"
 
-      PartnerNotifier.call(daily_report.since_time,
-                           daily_report.until_time,
-                           daily_report.responses.count)
+      PartnerNotifier.call(daily_report)
 
       puts "Partners have been notified"
     end
