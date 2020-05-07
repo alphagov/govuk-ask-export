@@ -28,4 +28,11 @@ RSpec.describe AskExport::Report do
       expect(instance.responses).to eq(responses)
     end
   end
+
+  describe "#filename_prefix" do
+    it "returns a the time range as a prefix" do
+      expect(described_class.new.filename_prefix)
+        .to eq("2020-04-30-1000-to-2020-05-01-1000")
+    end
+  end
 end

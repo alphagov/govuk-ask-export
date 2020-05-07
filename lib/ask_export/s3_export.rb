@@ -13,8 +13,8 @@ module AskExport
     def call
       csv_builder = CsvBuilder.new(report)
 
-      upload_to_s3("cabinet-office/#{report.until_time.to_date}.csv", csv_builder.cabinet_office)
-      upload_to_s3("third-party/#{report.until_time.to_date}.csv", csv_builder.third_party)
+      upload_to_s3("cabinet-office/#{report.filename_prefix}.csv", csv_builder.cabinet_office)
+      upload_to_s3("third-party/#{report.filename_prefix}.csv", csv_builder.third_party)
 
       puts "Files uploaded to S3"
 

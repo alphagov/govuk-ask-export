@@ -11,5 +11,10 @@ module AskExport
     def responses
       @responses ||= SurveyResponseFetcher.call(since_time, until_time)
     end
+
+    def filename_prefix
+      time_format = "%Y-%m-%d-%H%M"
+      "#{since_time.strftime(time_format)}-to-#{until_time.strftime(time_format)}"
+    end
   end
 end

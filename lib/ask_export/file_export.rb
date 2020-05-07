@@ -27,11 +27,11 @@ module AskExport
     attr_reader :report
 
     def cabinet_office_path
-      "#{output_directory}/#{report.until_time.to_date}-cabinet-office.csv"
+      "#{output_directory}/#{report.filename_prefix}-cabinet-office.csv"
     end
 
     def third_party_path
-      "#{output_directory}/#{report.until_time.to_date}-third-party.csv"
+      "#{output_directory}/#{report.filename_prefix}-third-party.csv"
     end
 
     def output_directory

@@ -29,15 +29,17 @@ RSpec.describe AskExport::S3Export do
                                     third_party: "third-party-data")
 
       expect(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
-      expect(s3_resource_stub.client).to receive(:put_object)
-                                     .with(bucket: s3_bucket,
-                                           key: "#{s3_path_prefix}cabinet-office/2020-05-01.csv",
-                                           body: "cabinet-office-data")
+      expect(s3_resource_stub.client)
+        .to receive(:put_object)
+        .with(bucket: s3_bucket,
+              key: "#{s3_path_prefix}cabinet-office/2020-04-30-1000-to-2020-05-01-1000.csv",
+              body: "cabinet-office-data")
 
-      expect(s3_resource_stub.client).to receive(:put_object)
-                                     .with(bucket: s3_bucket,
-                                           key: "#{s3_path_prefix}third-party/2020-05-01.csv",
-                                           body: "third-party-data")
+      expect(s3_resource_stub.client)
+        .to receive(:put_object)
+        .with(bucket: s3_bucket,
+              key: "#{s3_path_prefix}third-party/2020-04-30-1000-to-2020-05-01-1000.csv",
+              body: "third-party-data")
       described_class.call
     end
 
