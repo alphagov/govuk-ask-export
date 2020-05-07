@@ -4,16 +4,42 @@ RSpec.describe AskExport::Report do
   end
 
   describe "#since_time" do
-    it "returns 10am on the previous day in current time zone" do
+    it "defaults to 10am on the previous day in the current time zone" do
       expect(described_class.new.since_time)
         .to eq(Time.zone.parse("2020-04-30 10:00"))
+    end
+
+    it "can use the SINCE_TIME environment variable to specify the relative time on " \
+       "the previous day" do
+      ClimateControl.modify(SINCE_TIME: "12:16") do
+        expect(described_class.new.since_time).to eq(Time.zone.parse("2020-04-30 12:16"))
+      end
+    end
+
+    it "can be overridden with an absolute time with the SINCE_TIME environment variable" do
+      ClimateControl.modify(SINCE_TIME: "2020-01-01 12:16") do
+        expect(described_class.new.since_time).to eq(Time.zone.parse("2020-01-01 12:16"))
+      end
+    end
+
+    it "raises an ArgumentError when given a time that can't be parsed" do
+      ClimateControl.modify(SINCE_TIME: "Not a real time") do
+        expect { described_class.new.since_time }
+          .to raise_error(ArgumentError, %("Not a real time" could not be parsed as a time))
+      end
     end
   end
 
   describe "#until_time" do
-    it "returns 10am on the current day in current time zone" do
+    it "defaults to 10am on the current day in the current time zone" do
       expect(described_class.new.until_time)
         .to eq(Time.zone.parse("2020-05-01 10:00"))
+    end
+
+    it "can be overridden with the UNTIL_TIME environment variable" do
+      ClimateControl.modify(UNTIL_TIME: "2020-01-01 12:16") do
+        expect(described_class.new.until_time).to eq(Time.zone.parse("2020-01-01 12:16"))
+      end
     end
   end
 

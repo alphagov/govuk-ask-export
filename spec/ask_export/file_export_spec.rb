@@ -8,8 +8,8 @@ RSpec.describe AskExport::FileExport do
   end
 
   before do
-    allow(File).to receive(:write)
     allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
+    allow(File).to receive(:write)
   end
 
   it "writes files for each partner named with current date" do

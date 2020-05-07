@@ -10,11 +10,9 @@ RSpec.describe "S3 export" do
       NOTIFY_API_KEY: "#{SecureRandom.uuid}-#{SecureRandom.uuid}",
       CABINET_OFFICE_EMAIL_RECIPIENTS: "test@example.com",
       THIRD_PARTY_EMAIL_RECIPIENTS: "test@example.com",
+      SINCE_TIME: "2020-05-06 20:00",
+      UNTIL_TIME: "2020-05-07 11:00",
     ) { example.run }
-  end
-
-  around do |example|
-    travel_to(Time.zone.parse("2020-05-01 10:00")) { example.run }
   end
 
   around do |example|
