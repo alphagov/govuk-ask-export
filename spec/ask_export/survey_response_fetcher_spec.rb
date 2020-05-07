@@ -111,7 +111,8 @@ RSpec.describe AskExport::SurveyResponseFetcher do
       it "doesn't retry other 4xx responses" do
         request = stub_smart_survey_api(status: 404)
         expect { described_class.call(since_time, until_time) }
-          .to raise_error(Faraday::ClientError)
+          .to output.to_stdout
+          .and raise_error(Faraday::ClientError)
         expect(request).to have_been_made.once
       end
     end

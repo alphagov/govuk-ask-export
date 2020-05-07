@@ -23,20 +23,12 @@ module AskExport
         raise ArgumentError, "You are requesting an export for future data"
       end
 
+      puts "Requesting responses from #{since_time} until #{until_time}"
+
       page = 1
       responses = []
       loop do
-        survey_id = AskExport.config(:survey_id)
-        response = http_client.get("surveys/#{survey_id}/responses",
-                                   page: page,
-                                   page_size: RESPONSES_PER_REQUEST,
-                                   since: since_time.to_i,
-                                   until: until_time.to_i,
-                                   sort_by: "date_ended,asc",
-                                   include_labels: true,
-                                   completed: 1)
-
-        body = JSON.parse(response.body, symbolize_names: true)
+        body = JSON.parse(request_responses(page).body, symbolize_names: true)
 
         responses += body.filter { |entry| entry[:status] == "completed" }
                          .map { |entry| ResultPresenter.call(entry) }
@@ -51,7 +43,7 @@ module AskExport
         page += 1
       end
 
-      puts "#{responses.count} total completed responses from #{since_time} until #{until_time}"
+      puts "#{responses.count} total completed responses"
       responses
     end
 
@@ -60,6 +52,18 @@ module AskExport
   private
 
     attr_reader :since_time, :until_time
+
+    def request_responses(page)
+      survey_id = AskExport.config(:survey_id)
+      http_client.get("surveys/#{survey_id}/responses",
+                      page: page,
+                      page_size: RESPONSES_PER_REQUEST,
+                      since: since_time.to_i,
+                      until: until_time.to_i,
+                      sort_by: "date_ended,asc",
+                      include_labels: true,
+                      completed: 1)
+    end
 
     def http_client
       @http_client ||= Faraday.new(
