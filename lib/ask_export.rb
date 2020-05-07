@@ -2,11 +2,7 @@ require "active_support"
 require "active_support/time"
 Time.zone = "Europe/London"
 
-require_relative "ask_export/csv_builder"
-require_relative "ask_export/csv_splitter"
-require_relative "ask_export/partner_notifier"
-require_relative "ask_export/runner"
-require_relative "ask_export/survey_response_fetcher"
+Dir.glob(File.join(__dir__, "ask_export/*.rb")).sort.each { |file| require file }
 
 module AskExport
   CONFIG = {
