@@ -90,6 +90,13 @@ module AskExportHelper
     }
   end
 
+  def stubbed_daily_report
+    daily_report = AskExport::DailyReport.new
+    allow(daily_report).to receive(:responses)
+                       .and_return([presented_survey_response])
+    daily_report
+  end
+
 private
 
   def random_id
