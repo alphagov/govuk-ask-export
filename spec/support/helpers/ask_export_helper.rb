@@ -80,7 +80,7 @@ module AskExportHelper
   def presented_survey_response(options = {})
     {
       id: options.fetch(:id, random_id),
-      submission_time: "2020-05-01T09:00:00+01:00",
+      submission_time: "01/05/2020 09:00:00",
       region: options.fetch(:region, "Greater London"),
       question: "A question?",
       question_format: "In writing, to be read out at the press conference",
@@ -88,6 +88,13 @@ module AskExportHelper
       email: "jane@example.com",
       phone: "+447123456789",
     }
+  end
+
+  def stubbed_daily_report(responses: [presented_survey_response])
+    daily_report = AskExport::DailyReport.new
+    allow(daily_report).to receive(:responses)
+                       .and_return(responses)
+    daily_report
   end
 
 private

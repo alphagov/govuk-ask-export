@@ -8,6 +8,10 @@ RSpec.describe AskExport::PartnerNotifier do
       ) { example.run }
     end
 
+    around do |example|
+      travel_to(Time.zone.parse("2020-05-01 10:00")) { example.run }
+    end
+
     before do
       allow(Notifications::Client).to receive(:new).and_return(notify_client)
     end
@@ -24,19 +28,21 @@ RSpec.describe AskExport::PartnerNotifier do
       "person1@third-party.example.com, person2@third-party.example.com"
     end
 
-    let(:since_time) { Time.zone.parse("2020-04-30 10:00") }
-    let(:until_time) { Time.zone.parse("2020-05-01 10:00") }
-    let(:responses_count) { 1000 }
+    let(:daily_report) do
+      stubbed_daily_report(responses: [presented_survey_response,
+                                       presented_survey_response])
+    end
+
     let(:personalisation) do
       {
         since_time: "10:00am on 30 April 2020",
         until_time: "10:00am on 1 May 2020",
-        responses_count: 1000,
+        responses_count: 2,
       }
     end
 
     it "sends emails to cabinet office recipients" do
-      described_class.call(since_time, until_time, responses_count)
+      described_class.call(daily_report)
       expect(notify_client)
         .to have_received(:send_email)
         .with(email_address: "person1@cabinet-office.example.com",
@@ -50,7 +56,7 @@ RSpec.describe AskExport::PartnerNotifier do
     end
 
     it "sends emails to third party recipients" do
-      described_class.call(since_time, until_time, responses_count)
+      described_class.call(daily_report)
       expect(notify_client)
         .to have_received(:send_email)
         .with(email_address: "person1@third-party.example.com",

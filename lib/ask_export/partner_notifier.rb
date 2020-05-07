@@ -9,11 +9,9 @@ module AskExport
       new(*args).call
     end
 
-    def initialize(since_time, until_time, responses_count)
+    def initialize(daily_report)
       @client = Notifications::Client.new(ENV.fetch("NOTIFY_API_KEY"))
-      @since_time = since_time
-      @until_time = until_time
-      @responses_count = responses_count
+      @daily_report = daily_report
     end
 
     def call
@@ -25,7 +23,7 @@ module AskExport
 
   private
 
-    attr_reader :client, :since_time, :until_time, :responses_count
+    attr_reader :client, :daily_report
 
     def send_cabinet_office_emails
       ENV.fetch("CABINET_OFFICE_EMAIL_RECIPIENTS").split(",").each do |address|
@@ -46,9 +44,9 @@ module AskExport
     def personalisation
       time_formatting = "%-l:%M%P on %-d %B %Y"
       {
-        since_time: since_time.strftime(time_formatting),
-        until_time: until_time.strftime(time_formatting),
-        responses_count: responses_count,
+        since_time: daily_report.since_time.strftime(time_formatting),
+        until_time: daily_report.until_time.strftime(time_formatting),
+        responses_count: daily_report.responses.count,
       }
     end
   end

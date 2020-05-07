@@ -5,8 +5,8 @@ module AskExport
   class SurveyResponseFetcher
     RESPONSES_PER_REQUEST = 100
 
-    def self.call(*args, &block)
-      new(*args).call(&block)
+    def self.call(*args)
+      new(*args).call
     end
 
     def initialize(since_time, until_time)
@@ -15,6 +15,8 @@ module AskExport
     end
 
     def call
+      raise "Too early, submissions for today are still open" if until_time > Time.zone.now
+
       page = 1
       responses = []
       loop do
@@ -33,7 +35,7 @@ module AskExport
         responses += body.filter { |entry| entry[:status] == "completed" }
                          .map { |entry| ResultPresenter.call(entry) }
 
-        yield responses.count if block_given?
+        puts "downloaded #{responses.count} completed responses"
 
         break if body.length < RESPONSES_PER_REQUEST
 
@@ -43,6 +45,7 @@ module AskExport
         page += 1
       end
 
+      puts "#{responses.count} total completed responses from #{since_time} until #{until_time}"
       responses
     end
 
@@ -60,13 +63,21 @@ module AskExport
           api_token_secret: ENV.fetch("SMART_SURVEY_API_TOKEN_SECRET"),
         },
       ) do |f|
-        # retry when we got a nil response (likely a timeout), a 429 (rate limit
-        # exceeded) and any 500 server errors (covers intermittent ones like bad
-        # gateway or gateway timeout)
-        retry_if = ->(env, _) { env.status.nil? || env.status == 429 || env.status >= 500 }
+        interval = 20
+
+        retry_if = ->(env, exception) do
+          if env.status.nil?
+            puts "Request failed with #{exception.inspect}, retrying in #{interval} seconds"
+            true
+          elsif env.status == 429 || env.status >= 500
+            puts "Received a #{env.status} response, retrying in #{interval} seconds"
+            true
+          end
+        end
+
         f.request(:retry,
                   max: 3,
-                  interval: 20,
+                  interval: interval,
                   exceptions: [Faraday::Error],
                   methods: [], # has to be empty for the retry_if to execute
                   retry_if: retry_if)
@@ -85,9 +96,14 @@ module AskExport
 
       def call
         time_in_local_zone = Time.zone.iso8601(result[:date_ended])
+
+        # Consumers of these exports are already accustumed to a particular
+        # time formatting, this is retained here so outputs remain consistent
+        smart_survey_time_formatting = "%d/%m/%Y %H:%M:%S"
+
         {
           id: result[:id],
-          submission_time: time_in_local_zone.iso8601,
+          submission_time: time_in_local_zone.strftime(smart_survey_time_formatting),
           region: fetch_choice_answer(:region_field_id),
           question: fetch_value_answer(:question_field_id),
           question_format: fetch_choice_answer(:question_format_field_id),
