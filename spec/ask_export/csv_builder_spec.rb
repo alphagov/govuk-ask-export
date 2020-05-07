@@ -20,8 +20,8 @@ RSpec.describe AskExport::CsvBuilder do
         builder = described_class.new(stubbed_daily_report(responses: responses))
         expect(builder.cabinet_office).to eq(
           "id,submission_time,region,name,email,phone,question_format\n" \
-          "1,2020-05-01T09:00:00+01:00,Scotland,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n" \
-          "2,2020-05-01T09:00:00+01:00,Yorkshire and the Humber,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n",
+          "1,01/05/2020 09:00:00,Scotland,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n" \
+          "2,01/05/2020 09:00:00,Yorkshire and the Humber,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n",
         )
       end
     end
@@ -41,8 +41,8 @@ RSpec.describe AskExport::CsvBuilder do
         builder = described_class.new(stubbed_daily_report(responses: responses))
         expect(builder.third_party).to eq(
           "id,submission_time,region,question,question_format\n" \
-          "1,2020-05-01T09:00:00+01:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n" \
-          "2,2020-05-01T09:00:00+01:00,Yorkshire and the Humber,A question?,\"In writing, to be read out at the press conference\"\n",
+          "1,01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n" \
+          "2,01/05/2020 09:00:00,Yorkshire and the Humber,A question?,\"In writing, to be read out at the press conference\"\n",
         )
       end
     end

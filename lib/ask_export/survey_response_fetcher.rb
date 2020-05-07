@@ -96,9 +96,14 @@ module AskExport
 
       def call
         time_in_local_zone = Time.zone.iso8601(result[:date_ended])
+
+        # Consumers of these exports are already accustumed to a particular
+        # time formatting, this is retained here so outputs remain consistent
+        smart_survey_time_formatting = "%d/%m/%Y %H:%M:%S"
+
         {
           id: result[:id],
-          submission_time: time_in_local_zone.iso8601,
+          submission_time: time_in_local_zone.strftime(smart_survey_time_formatting),
           region: fetch_choice_answer(:region_field_id),
           question: fetch_value_answer(:question_field_id),
           question_format: fetch_choice_answer(:question_format_field_id),

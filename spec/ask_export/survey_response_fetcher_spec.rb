@@ -33,7 +33,8 @@ RSpec.describe AskExport::SurveyResponseFetcher do
 
       it "returns a hash of a presented response from Smart Survey" do
         presented_response = presented_survey_response
-        stub_smart_survey_api(body: [smart_survey_row(presented_response)])
+        survey_options = presented_response.merge(submission_time: "2020-05-01T09:00:00+01:00")
+        stub_smart_survey_api(body: [smart_survey_row(survey_options)])
         expect(described_class.call(since_time, until_time))
           .to eql([presented_response])
       end
