@@ -14,10 +14,11 @@ module AskExport
       csv_builder = CsvBuilder.new(report)
 
       File.write(cabinet_office_path, csv_builder.cabinet_office, mode: "w")
+      File.write(data_labs_path, csv_builder.data_labs, mode: "w")
       File.write(third_party_path, csv_builder.third_party, mode: "w")
 
-      puts "CSV files have been output to #{relative_to_cwd(cabinet_office_path)} " \
-        "and #{relative_to_cwd(third_party_path)}"
+      puts "CSV files have been output to #{relative_to_cwd(cabinet_office_path)}, " \
+        "#{relative_to_cwd(data_labs_path)} and #{relative_to_cwd(third_party_path)}"
     end
 
     private_class_method :new
@@ -28,6 +29,10 @@ module AskExport
 
     def cabinet_office_path
       "#{output_directory}/#{report.filename_prefix}-cabinet-office.csv"
+    end
+
+    def data_labs_path
+      "#{output_directory}/#{report.filename_prefix}-data-labs.csv"
     end
 
     def third_party_path

@@ -3,6 +3,7 @@ require "notifications/client"
 module AskExport
   class PartnerNotifier
     CABINET_OFFICE_TEMPLATE_ID = "4f81afc5-c018-4305-ad1e-b722189d4a10".freeze
+    DATA_LABS_TEMPLATE_ID = "53f2afe6-e9cc-455f-847b-c2f02ba8d485".freeze
     THIRD_PARTY_TEMPLATE_ID = "959ac4b4-b640-459e-a037-981a3049d55b".freeze
 
     def self.call(*args)
@@ -16,6 +17,7 @@ module AskExport
 
     def call
       send_cabinet_office_emails
+      send_data_labs_emails
       send_third_party_emails
     end
 
@@ -29,6 +31,14 @@ module AskExport
       ENV.fetch("CABINET_OFFICE_EMAIL_RECIPIENTS").split(",").each do |address|
         client.send_email(email_address: address.strip,
                           template_id: CABINET_OFFICE_TEMPLATE_ID,
+                          personalisation: personalisation)
+      end
+    end
+
+    def send_data_labs_emails
+      ENV.fetch("DATA_LABS_EMAIL_RECIPIENTS").split(",").each do |address|
+        client.send_email(email_address: address.strip,
+                          template_id: DATA_LABS_TEMPLATE_ID,
                           personalisation: personalisation)
       end
     end

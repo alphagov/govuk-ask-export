@@ -27,6 +27,27 @@ RSpec.describe AskExport::CsvBuilder do
     end
   end
 
+  describe "#data_labs" do
+    context "when there are no responses" do
+      it "returns a csv string of the headers" do
+        builder = described_class.new(stubbed_report(responses: []))
+        expect(builder.data_labs)
+          .to eq("submission_time,region,question,question_format\n")
+      end
+    end
+
+    context "when there are responses" do
+      it "returns a csv of data labs data" do
+        builder = described_class.new(stubbed_report(responses: responses))
+        expect(builder.data_labs).to eq(
+          "submission_time,region,question,question_format\n" \
+          "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n" \
+          "01/05/2020 09:00:00,Yorkshire and the Humber,A question?,\"In writing, to be read out at the press conference\"\n",
+        )
+      end
+    end
+  end
+
   describe "#third_party" do
     context "when there are no responses" do
       it "returns a csv string of the headers" do

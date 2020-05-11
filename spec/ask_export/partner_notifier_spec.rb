@@ -4,6 +4,7 @@ RSpec.describe AskExport::PartnerNotifier do
       ClimateControl.modify(
         NOTIFY_API_KEY: "secret",
         CABINET_OFFICE_EMAIL_RECIPIENTS: cabinet_office_emails,
+        DATA_LABS_EMAIL_RECIPIENTS: data_labs_emails,
         THIRD_PARTY_EMAIL_RECIPIENTS: third_party_emails,
       ) { example.run }
     end
@@ -22,6 +23,10 @@ RSpec.describe AskExport::PartnerNotifier do
 
     let(:cabinet_office_emails) do
       "person1@cabinet-office.example.com, person2@cabinet-office.example.com"
+    end
+
+    let(:data_labs_emails) do
+      "person1@data-labs.example.com, person2@data-labs.example.com"
     end
 
     let(:third_party_emails) do
@@ -52,6 +57,20 @@ RSpec.describe AskExport::PartnerNotifier do
         .to have_received(:send_email)
         .with(email_address: "person2@cabinet-office.example.com",
               template_id: described_class::CABINET_OFFICE_TEMPLATE_ID,
+              personalisation: personalisation)
+    end
+
+    it "sends emails to data labs recipients" do
+      described_class.call(report)
+      expect(notify_client)
+        .to have_received(:send_email)
+        .with(email_address: "person1@data-labs.example.com",
+              template_id: described_class::DATA_LABS_TEMPLATE_ID,
+              personalisation: personalisation)
+      expect(notify_client)
+        .to have_received(:send_email)
+        .with(email_address: "person2@data-labs.example.com",
+              template_id: described_class::DATA_LABS_TEMPLATE_ID,
               personalisation: personalisation)
     end
 

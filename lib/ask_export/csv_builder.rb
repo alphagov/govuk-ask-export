@@ -16,6 +16,10 @@ module AskExport
                 :question_format)
     end
 
+    def data_labs
+      build_csv(:submission_time, :region, :question, :question_format)
+    end
+
     def third_party
       build_csv(:id,
                 :submission_time,
