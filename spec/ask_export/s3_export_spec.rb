@@ -17,7 +17,7 @@ RSpec.describe AskExport::S3Export do
   let(:s3_resource_stub) { Aws::S3::Resource.new(stub_responses: true) }
 
   before do
-    allow(AskExport::DailyReport).to receive(:new).and_return(stubbed_daily_report)
+    allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
     allow(Aws::S3::Resource).to receive(:new).and_return(s3_resource_stub)
     allow(AskExport::PartnerNotifier).to receive(:call)
   end
@@ -29,15 +29,17 @@ RSpec.describe AskExport::S3Export do
                                     third_party: "third-party-data")
 
       expect(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
-      expect(s3_resource_stub.client).to receive(:put_object)
-                                     .with(bucket: s3_bucket,
-                                           key: "#{s3_path_prefix}cabinet-office/2020-05-01.csv",
-                                           body: "cabinet-office-data")
+      expect(s3_resource_stub.client)
+        .to receive(:put_object)
+        .with(bucket: s3_bucket,
+              key: "#{s3_path_prefix}cabinet-office/2020-04-30-1000-to-2020-05-01-1000.csv",
+              body: "cabinet-office-data")
 
-      expect(s3_resource_stub.client).to receive(:put_object)
-                                     .with(bucket: s3_bucket,
-                                           key: "#{s3_path_prefix}third-party/2020-05-01.csv",
-                                           body: "third-party-data")
+      expect(s3_resource_stub.client)
+        .to receive(:put_object)
+        .with(bucket: s3_bucket,
+              key: "#{s3_path_prefix}third-party/2020-04-30-1000-to-2020-05-01-1000.csv",
+              body: "third-party-data")
       described_class.call
     end
 

@@ -47,11 +47,20 @@ The following environment variables are available:
   of colleagues at the cabinet office who will be emailed upon a successful export
 - `THIRD_PARTY_EMAIL_RECIPIENTS` - a comma separated list of email addresses
   of third party colleagues who will be emailed upon a successful export
+- `SINCE_TIME` (optional) - defaults to "10:00", can be changed to alter the time
+  exports include data from. When this a relative time (for example "10:00") it
+  will be for the previous day, otherwise an absolute time can be set (for example
+  "2020-05-01 10:00") for a precise data export
+- `UNTIL_TIME` (optional) - defaults to "10:00", can be changed to alter the time
+  exports include data until. When this a relative time (for example "10:00") it
+  will be for the current day, otherwise an absolute time can be set (for example
+  "2020-05-01 10:00") for a precise data export
 
 ### Manual export
 
 If the daily export cannot be run or fails we have a manual process that can
-be run on a local machine to generate the CSV files.
+be run on a local machine to generate the CSV files. This can also be used
+to handle requests for ad-hoc time periods.
 
 You'll need the API token and API Token Secret for Smart Survey which can be
 found in the Account > API Keys section.
@@ -65,11 +74,21 @@ SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secr
 There should now be files created in the `output` directory of this project
 that can be shared.
 
+You can specify the time range the export should run from and until with the
+`SINCE_TIME` and `UNTIL_TIME` environment variables. It is recommended you
+use ISO 8601 formatting such as "2020-05-01 10:00" or "10:00"
+
+For example:
+
+```
+SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+```
+
 To perform the live export you need `SMART_SURVEY_LIVE` to equal `"true"`, for
 example:
 
 ```
-SMART_SURVEY_LIVE=true SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SMART_SURVEY_LIVE=true SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
 ```
 
 This should now have added files to the `output` directory (it will have

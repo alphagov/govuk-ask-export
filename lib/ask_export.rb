@@ -2,7 +2,7 @@ require "active_support"
 require "active_support/time"
 Time.zone = "Europe/London"
 
-Dir.glob(File.join(__dir__, "ask_export/*.rb")).sort.each { |file| require file }
+Dir.glob(File.join(__dir__, "ask_export/**/*.rb")).sort.each { |file| require file }
 
 module AskExport
   CONFIG = {

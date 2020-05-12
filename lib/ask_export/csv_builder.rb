@@ -2,8 +2,8 @@ require "csv"
 
 module AskExport
   class CsvBuilder
-    def initialize(daily_report)
-      @daily_report = daily_report
+    def initialize(report)
+      @report = report
     end
 
     def cabinet_office
@@ -26,12 +26,12 @@ module AskExport
 
   private
 
-    attr_reader :daily_report
+    attr_reader :report
 
     def build_csv(*fields)
       CSV.generate do |csv|
         csv << fields
-        daily_report.responses.each { |row| csv << row.slice(*fields).values }
+        report.responses.each { |row| csv << row.slice(*fields).values }
       end
     end
   end

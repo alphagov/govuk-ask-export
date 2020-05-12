@@ -8,8 +8,8 @@ RSpec.describe AskExport::FileExport do
   end
 
   before do
+    allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
     allow(File).to receive(:write)
-    allow(AskExport::DailyReport).to receive(:new).and_return(stubbed_daily_report)
   end
 
   it "writes files for each partner named with current date" do
@@ -20,13 +20,15 @@ RSpec.describe AskExport::FileExport do
 
     described_class.call
 
-    expect(File).to have_received(:write)
-                .with(File.expand_path("../../output/2020-05-01-cabinet-office.csv", __dir__),
-                      csv_builder.cabinet_office,
-                      mode: "w")
-    expect(File).to have_received(:write)
-                .with(File.expand_path("../../output/2020-05-01-third-party.csv", __dir__),
-                      csv_builder.third_party,
-                      mode: "w")
+    expect(File)
+      .to have_received(:write)
+      .with(File.expand_path("../../output/2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv", __dir__),
+            csv_builder.cabinet_office,
+            mode: "w")
+    expect(File)
+      .to have_received(:write)
+      .with(File.expand_path("../../output/2020-04-30-1000-to-2020-05-01-1000-third-party.csv", __dir__),
+            csv_builder.third_party,
+            mode: "w")
   end
 end

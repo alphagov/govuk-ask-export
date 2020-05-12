@@ -84,7 +84,12 @@ RSpec.describe AskExport::SurveyResponseFetcher do
     context "unsuccessful retrivals" do
       it "raises an error if until time is after the current time" do
         expect { described_class.call(since_time, Time.zone.now + 60) }
-          .to raise_error("Too early, submissions for today are still open")
+          .to raise_error(ArgumentError, "You are requesting an export for future data")
+      end
+
+      it "raises an error if since time is after the until time" do
+        expect { described_class.call(Time.zone.now + 120, Time.zone.now + 60) }
+          .to raise_error(ArgumentError, "Export since time must be before the until time")
       end
 
       it "retries 429 responses 3 times before raising an error" do
@@ -106,7 +111,8 @@ RSpec.describe AskExport::SurveyResponseFetcher do
       it "doesn't retry other 4xx responses" do
         request = stub_smart_survey_api(status: 404)
         expect { described_class.call(since_time, until_time) }
-          .to raise_error(Faraday::ClientError)
+          .to output.to_stdout
+          .and raise_error(Faraday::ClientError)
         expect(request).to have_been_made.once
       end
     end

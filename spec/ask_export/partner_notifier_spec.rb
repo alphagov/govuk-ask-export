@@ -28,9 +28,9 @@ RSpec.describe AskExport::PartnerNotifier do
       "person1@third-party.example.com, person2@third-party.example.com"
     end
 
-    let(:daily_report) do
-      stubbed_daily_report(responses: [presented_survey_response,
-                                       presented_survey_response])
+    let(:report) do
+      stubbed_report(responses: [presented_survey_response,
+                                 presented_survey_response])
     end
 
     let(:personalisation) do
@@ -42,7 +42,7 @@ RSpec.describe AskExport::PartnerNotifier do
     end
 
     it "sends emails to cabinet office recipients" do
-      described_class.call(daily_report)
+      described_class.call(report)
       expect(notify_client)
         .to have_received(:send_email)
         .with(email_address: "person1@cabinet-office.example.com",
@@ -56,7 +56,7 @@ RSpec.describe AskExport::PartnerNotifier do
     end
 
     it "sends emails to third party recipients" do
-      described_class.call(daily_report)
+      described_class.call(report)
       expect(notify_client)
         .to have_received(:send_email)
         .with(email_address: "person1@third-party.example.com",
