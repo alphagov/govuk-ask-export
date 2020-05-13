@@ -5,6 +5,7 @@ RSpec.describe AskExport::PartnerNotifier do
         NOTIFY_API_KEY: "secret",
         CABINET_OFFICE_EMAIL_RECIPIENTS: cabinet_office_emails,
         DATA_LABS_EMAIL_RECIPIENTS: data_labs_emails,
+        PERFORMANCE_ANALYST_EMAIL_RECIPIENTS: performance_analyst_emails,
         THIRD_PARTY_EMAIL_RECIPIENTS: third_party_emails,
       ) { example.run }
     end
@@ -25,24 +26,21 @@ RSpec.describe AskExport::PartnerNotifier do
       "person1@cabinet-office.example.com, person2@cabinet-office.example.com"
     end
 
-    let(:data_labs_emails) do
-      "person1@data-labs.example.com, person2@data-labs.example.com"
-    end
-
-    let(:third_party_emails) do
-      "person1@third-party.example.com, person2@third-party.example.com"
-    end
+    let(:data_labs_emails) { "person1@data-labs.example.com" }
+    let(:performance_analyst_emails) { "person1@performance-analyst.example.com" }
+    let(:third_party_emails) { "person1@third-party.example.com" }
 
     let(:report) do
       stubbed_report(responses: [presented_survey_response,
-                                 presented_survey_response])
+                                 presented_survey_response(status: "disqualified")])
     end
 
     let(:personalisation) do
       {
         since_time: "10:00am on 30 April 2020",
         until_time: "10:00am on 1 May 2020",
-        responses_count: 2,
+        all_responses_count: 2,
+        completed_responses_count: 1,
       }
     end
 
@@ -67,10 +65,14 @@ RSpec.describe AskExport::PartnerNotifier do
         .with(email_address: "person1@data-labs.example.com",
               template_id: described_class::DATA_LABS_TEMPLATE_ID,
               personalisation: personalisation)
+    end
+
+    it "sends emails to performance analyst recipients" do
+      described_class.call(report)
       expect(notify_client)
         .to have_received(:send_email)
-        .with(email_address: "person2@data-labs.example.com",
-              template_id: described_class::DATA_LABS_TEMPLATE_ID,
+        .with(email_address: "person1@performance-analyst.example.com",
+              template_id: described_class::PERFORMANCE_ANALYST_TEMPLATE_ID,
               personalisation: personalisation)
     end
 
@@ -79,11 +81,6 @@ RSpec.describe AskExport::PartnerNotifier do
       expect(notify_client)
         .to have_received(:send_email)
         .with(email_address: "person1@third-party.example.com",
-              template_id: described_class::THIRD_PARTY_TEMPLATE_ID,
-              personalisation: personalisation)
-      expect(notify_client)
-        .to have_received(:send_email)
-        .with(email_address: "person2@third-party.example.com",
               template_id: described_class::THIRD_PARTY_TEMPLATE_ID,
               personalisation: personalisation)
     end

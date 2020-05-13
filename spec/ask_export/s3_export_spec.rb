@@ -23,30 +23,27 @@ RSpec.describe AskExport::S3Export do
   end
 
   describe ".call" do
-    it "uploads cabinet office, data labs and third party CSVs to S3" do
+    it "uploads cabinet office, data labs, performance_analyst and third party CSVs to S3" do
       csv_builder = instance_double(AskExport::CsvBuilder,
                                     cabinet_office: "cabinet-office-data",
                                     data_labs: "data-labs-data",
+                                    performance_analyst: "performance-analyst-data",
                                     third_party: "third-party-data")
 
       expect(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
-      expect(s3_resource_stub.client)
-        .to receive(:put_object)
-        .with(bucket: s3_bucket,
-              key: "#{s3_path_prefix}cabinet-office/2020-04-30-1000-to-2020-05-01-1000.csv",
-              body: "cabinet-office-data")
 
-      expect(s3_resource_stub.client)
-        .to receive(:put_object)
-        .with(bucket: s3_bucket,
-              key: "#{s3_path_prefix}data-labs/2020-04-30-1000-to-2020-05-01-1000.csv",
-              body: "data-labs-data")
-
-      expect(s3_resource_stub.client)
-        .to receive(:put_object)
-        .with(bucket: s3_bucket,
-              key: "#{s3_path_prefix}third-party/2020-04-30-1000-to-2020-05-01-1000.csv",
-              body: "third-party-data")
+      {
+        "cabinet-office" => csv_builder.cabinet_office,
+        "data-labs" => csv_builder.data_labs,
+        "performance-analyst" => csv_builder.performance_analyst,
+        "third-party" => csv_builder.third_party,
+      }.each do |recipient, data|
+        expect(s3_resource_stub.client)
+          .to receive(:put_object)
+          .with(bucket: s3_bucket,
+                key: "#{s3_path_prefix + recipient}/2020-04-30-1000-to-2020-05-01-1000.csv",
+                body: data)
+      end
       described_class.call
     end
 
