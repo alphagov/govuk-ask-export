@@ -30,10 +30,9 @@ module AskExport
       loop do
         body = JSON.parse(request_responses(page).body, symbolize_names: true)
 
-        responses += body.filter { |entry| entry[:status] == "completed" }
-                         .map { |entry| ResultPresenter.call(entry) }
+        responses += body.map { |entry| ResponsePresenter.call(entry) }
 
-        puts "downloaded #{responses.count} completed responses"
+        puts "downloaded #{responses.count} responses"
 
         break if body.length < RESPONSES_PER_REQUEST
 
@@ -43,7 +42,8 @@ module AskExport
         page += 1
       end
 
-      puts "#{responses.count} total completed responses"
+      completed = responses.count { |r| r[:status] == "completed" }
+      puts "#{responses.count} total responses, #{completed} completed responses"
       responses
     end
 
@@ -62,7 +62,8 @@ module AskExport
                       until: until_time.to_i,
                       sort_by: "date_ended,asc",
                       include_labels: true,
-                      completed: 1)
+                      # include both partial and completed responses
+                      completed: 2)
     end
 
     def http_client
@@ -92,55 +93,6 @@ module AskExport
                   methods: [], # has to be empty for the retry_if to execute
                   retry_if: retry_if)
         f.response(:raise_error)
-      end
-    end
-
-    class ResultPresenter
-      def self.call(*args)
-        new(*args).call
-      end
-
-      def initialize(result)
-        @result = result
-      end
-
-      def call
-        time_in_local_zone = Time.zone.iso8601(result[:date_ended])
-
-        # Consumers of these exports are already accustumed to a particular
-        # time formatting, this is retained here so outputs remain consistent
-        smart_survey_time_formatting = "%d/%m/%Y %H:%M:%S"
-
-        {
-          id: result[:id],
-          submission_time: time_in_local_zone.strftime(smart_survey_time_formatting),
-          region: fetch_choice_answer(:region_field_id),
-          question: fetch_value_answer(:question_field_id),
-          question_format: fetch_choice_answer(:question_format_field_id),
-          name: fetch_value_answer(:name_field_id),
-          email: fetch_value_answer(:email_field_id),
-          phone: fetch_value_answer(:phone_field_id),
-        }
-      end
-
-      private_class_method :new
-
-    private
-
-      attr_reader :result
-
-      def fetch_value_answer(field_id)
-        fetch_answer(field_id).to_h[:value]
-      end
-
-      def fetch_choice_answer(field_id)
-        fetch_answer(field_id).to_h[:choice_title]
-      end
-
-      def fetch_answer(field_id)
-        result[:pages].flat_map { |page| page[:questions] }
-                      .find { |question| question[:id] == AskExport.config(field_id) }
-                      .then { |response| response.to_h[:answers]&.first }
       end
     end
   end

@@ -31,17 +31,16 @@ RSpec.describe AskExport::SurveyResponseFetcher do
         expect(request).to have_been_made
       end
 
-      it "returns a hash of a presented response from Smart Survey" do
+      it "delegates to ResponsePresenter to serialize the response from Smart Survey" do
+        record = smart_survey_row
+        stub_smart_survey_api(body: [record])
         presented_response = presented_survey_response
-        survey_options = presented_response.merge(submission_time: "2020-05-01T09:00:00+01:00")
-        stub_smart_survey_api(body: [smart_survey_row(survey_options)])
+        expect(described_class::ResponsePresenter).to receive(:call)
+                                                  .with(record)
+                                                  .and_return(presented_response)
+
         expect(described_class.call(since_time, until_time))
           .to eql([presented_response])
-      end
-
-      it "strips responses from Smart Survey which don't have a status of completed" do
-        stub_smart_survey_api(body: [smart_survey_row(status: "disqualified")])
-        expect(described_class.call(since_time, until_time)).to eql([])
       end
 
       it "requests multiple pages when there are more results than the page size" do
