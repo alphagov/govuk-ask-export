@@ -16,9 +16,9 @@ RSpec.describe "File export" do
       end
 
       expect(smart_survey_request).to have_been_made
-      expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-cabinet-office.csv"))
-      expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-data-labs.csv"))
-      expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-third-party.csv"))
+      %w[cabinet-office data-labs performance-analyst third-party].each do |recipient|
+        expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv"))
+      end
     end
   end
 end

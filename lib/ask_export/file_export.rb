@@ -13,12 +13,17 @@ module AskExport
     def call
       csv_builder = CsvBuilder.new(report)
 
-      File.write(cabinet_office_path, csv_builder.cabinet_office, mode: "w")
-      File.write(data_labs_path, csv_builder.data_labs, mode: "w")
-      File.write(third_party_path, csv_builder.third_party, mode: "w")
+      files = {
+        output_path("cabinet-office") => csv_builder.cabinet_office,
+        output_path("data-labs") => csv_builder.data_labs,
+        output_path("performance-analyst") => csv_builder.performance_analyst,
+        output_path("third-party") => csv_builder.third_party,
+      }
 
-      puts "CSV files have been output to #{relative_to_cwd(cabinet_office_path)}, " \
-        "#{relative_to_cwd(data_labs_path)} and #{relative_to_cwd(third_party_path)}"
+      files.each { |path, data| File.write(path, data, mode: "w") }
+      relative_paths = files.keys.map { |path| relative_to_cwd(path) }
+
+      puts "CSV files have been output to: #{relative_paths.join(', ')}"
     end
 
     private_class_method :new
@@ -27,16 +32,8 @@ module AskExport
 
     attr_reader :report
 
-    def cabinet_office_path
-      "#{output_directory}/#{report.filename_prefix}-cabinet-office.csv"
-    end
-
-    def data_labs_path
-      "#{output_directory}/#{report.filename_prefix}-data-labs.csv"
-    end
-
-    def third_party_path
-      "#{output_directory}/#{report.filename_prefix}-third-party.csv"
+    def output_path(recipient)
+      "#{output_directory}/#{report.filename_prefix}-#{recipient}.csv"
     end
 
     def output_directory

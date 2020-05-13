@@ -16,6 +16,7 @@ RSpec.describe AskExport::FileExport do
     csv_builder = instance_double(AskExport::CsvBuilder,
                                   cabinet_office: "cabinet-office-data",
                                   data_labs: "data-labs-data",
+                                  performance_analyst: "performance-analyst-data",
                                   third_party: "third-party-data")
     allow(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
 
@@ -24,6 +25,7 @@ RSpec.describe AskExport::FileExport do
     {
       "cabinet-office" => csv_builder.cabinet_office,
       "data-labs" => csv_builder.data_labs,
+      "performance-analyst" => csv_builder.performance_analyst,
       "third-party" => csv_builder.third_party,
     }.each do |filename_suffix, data|
       expected_file = "../../output/2020-04-30-1000-to-2020-05-01-1000-#{filename_suffix}.csv"
