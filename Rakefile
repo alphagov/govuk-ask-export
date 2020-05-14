@@ -7,7 +7,7 @@ RSpec::Core::RakeTask.new
 
 task default: %w[rubocop spec]
 
-desc "Run the process to export questions and output them as files"
+desc "Export questions from Smart Survey and output CSV files"
 task :file_export do
   AskExport::FileExport.call
 end
