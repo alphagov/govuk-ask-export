@@ -1,3 +1,5 @@
+require "tmpdir"
+
 RSpec.describe "File export" do
   around do |example|
     expect { example.run }.to output.to_stdout

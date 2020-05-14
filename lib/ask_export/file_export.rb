@@ -1,5 +1,3 @@
-require "aws-sdk-s3"
-
 module AskExport
   class FileExport
     def self.call
