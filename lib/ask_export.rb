@@ -1,6 +1,8 @@
 require "active_support"
 require "active_support/time"
+require "google/apis/drive_v3"
 Time.zone = "Europe/London"
+Google::Apis::RequestOptions.default.retries = 5
 
 Dir.glob(File.join(__dir__, "ask_export/**/*.rb")).sort.each { |file| require file }
 

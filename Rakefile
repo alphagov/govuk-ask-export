@@ -7,6 +7,12 @@ RSpec::Core::RakeTask.new
 
 task default: %w[rubocop spec]
 
+desc "Export questions from Smart Survey, upload output CSV files to Google " \
+  "Drive and share with recipients"
+task :drive_export do
+  AskExport::DriveExport.call
+end
+
 desc "Export questions from Smart Survey and output CSV files"
 task :file_export do
   AskExport::FileExport.call
