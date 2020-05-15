@@ -55,6 +55,20 @@ RSpec.describe AskExport::Report do
     end
   end
 
+  describe "#completed_responses" do
+    it "returns only completed survey responses" do
+      completed_response = presented_survey_response(status: "completed")
+      partial_response = presented_survey_response(status: "partial")
+      disqualified_response = presented_survey_response(status: "disqualified")
+
+      allow(AskExport::SurveyResponseFetcher)
+        .to receive(:call)
+        .and_return([completed_response, partial_response, disqualified_response])
+
+      expect(described_class.new.completed_responses).to eq([completed_response])
+    end
+  end
+
   describe "#filename_prefix" do
     it "returns a the time range as a prefix" do
       expect(described_class.new.filename_prefix)

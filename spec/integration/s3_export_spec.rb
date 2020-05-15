@@ -9,6 +9,8 @@ RSpec.describe "S3 export" do
       S3_BUCKET: "bucket",
       NOTIFY_API_KEY: "#{SecureRandom.uuid}-#{SecureRandom.uuid}",
       CABINET_OFFICE_EMAIL_RECIPIENTS: "test@example.com",
+      DATA_LABS_EMAIL_RECIPIENTS: "test@example.com",
+      PERFORMANCE_ANALYST_EMAIL_RECIPIENTS: "test@example.com",
       THIRD_PARTY_EMAIL_RECIPIENTS: "test@example.com",
       SINCE_TIME: "2020-05-06 20:00",
       UNTIL_TIME: "2020-05-07 11:00",
@@ -32,7 +34,7 @@ RSpec.describe "S3 export" do
   it "fetches surveys and uploads them to s3" do
     Rake::Task["s3_export"].invoke
     expect(smart_survey_request).to have_been_made
-    expect(s3_request).to have_been_made.twice
-    expect(notify_request).to have_been_made.twice
+    expect(s3_request).to have_been_made.times(4)
+    expect(notify_request).to have_been_made.times(4)
   end
 end

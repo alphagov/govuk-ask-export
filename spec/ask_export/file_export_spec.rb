@@ -15,20 +15,25 @@ RSpec.describe AskExport::FileExport do
   it "writes files for each partner named with current date" do
     csv_builder = instance_double(AskExport::CsvBuilder,
                                   cabinet_office: "cabinet-office-data",
+                                  data_labs: "data-labs-data",
+                                  performance_analyst: "performance-analyst-data",
                                   third_party: "third-party-data")
     allow(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
 
     described_class.call
 
-    expect(File)
-      .to have_received(:write)
-      .with(File.expand_path("../../output/2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv", __dir__),
-            csv_builder.cabinet_office,
-            mode: "w")
-    expect(File)
-      .to have_received(:write)
-      .with(File.expand_path("../../output/2020-04-30-1000-to-2020-05-01-1000-third-party.csv", __dir__),
-            csv_builder.third_party,
-            mode: "w")
+    {
+      "cabinet-office" => csv_builder.cabinet_office,
+      "data-labs" => csv_builder.data_labs,
+      "performance-analyst" => csv_builder.performance_analyst,
+      "third-party" => csv_builder.third_party,
+    }.each do |filename_suffix, data|
+      expected_file = "../../output/2020-04-30-1000-to-2020-05-01-1000-#{filename_suffix}.csv"
+      expect(File)
+        .to have_received(:write)
+        .with(File.expand_path(expected_file, __dir__),
+              data,
+              mode: "w")
+    end
   end
 end

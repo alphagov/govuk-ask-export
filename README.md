@@ -45,6 +45,10 @@ The following environment variables are available:
   files are ready
 - `CABINET_OFFICE_EMAIL_RECIPIENTS` - a comma separated list of email addresses
   of colleagues at the cabinet office who will be emailed upon a successful export
+- `DATA_LABS_EMAIL_RECIPIENTS` - a comma separated list of email addresses
+  of colleagues in the Data Labs team who will be emailed upon a successful export
+- `PERFORMANCE_ANALYST_EMAIL_RECIPIENTS` - a comma separated list of email addresses
+  of performance analysts who will be emailed upon a successful export
 - `THIRD_PARTY_EMAIL_RECIPIENTS` - a comma separated list of email addresses
   of third party colleagues who will be emailed upon a successful export
 - `SINCE_TIME` (optional) - defaults to "10:00", can be changed to alter the time
