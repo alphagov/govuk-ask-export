@@ -45,6 +45,8 @@ GEM
     minitest (5.14.0)
     multi_json (1.14.1)
     multipart-post (2.1.1)
+    notifications-ruby-client (5.1.2)
+      jwt (>= 1.5, < 3)
     os (1.1.0)
     parallel (1.19.1)
     parser (2.7.1.2)
@@ -119,6 +121,7 @@ DEPENDENCIES
   climate_control
   faraday
   google-api-client
+  notifications-ruby-client
   rake
   rspec
   rubocop-govuk

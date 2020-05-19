@@ -22,9 +22,16 @@ RSpec.describe AskExport::DriveExport do
     end
 
     before do
-      allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
+      allow(AskExport::Report).to receive(:new).and_return(report)
       allow(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
-      allow(AskExport::DriveUploader).to receive(:new).and_return(drive_uploader)
+      allow(AskExport::FileDistributor).to receive(:new).and_return(file_distributor)
+    end
+
+    let(:report) do
+      # have a mix of reports to illustrate difference for audiences
+      responses = [presented_survey_response(status: "completed"),
+                   presented_survey_response(status: "partial")]
+      stubbed_report(responses: responses)
     end
 
     let(:csv_builder) do
@@ -35,62 +42,75 @@ RSpec.describe AskExport::DriveExport do
                       third_party: "third-party-data")
     end
 
-    let(:drive_uploader) do
-      instance_double(AskExport::DriveUploader,
+    let(:file_distributor) do
+      instance_double(AskExport::FileDistributor,
                       upload_csv: OpenStruct.new(id: "file-id"),
                       share_file: nil)
+    end
+
+    let(:personalisation) do
+      {
+        responses_count: 1,
+        since_time: "10:00am on 30 April 2020",
+        until_time: "10:00am on 1 May 2020",
+      }
     end
 
     it "uploads and shares a CSV for the Cabinet Office" do
       described_class.call
 
-      expect(drive_uploader).to have_received(:upload_csv)
-                            .with("2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv",
-                                  "cabinet-office-data",
-                                  "cabinet-office-folder-id")
+      expect(file_distributor).to have_received(:upload_csv)
+                              .with("2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv",
+                                    "cabinet-office-data",
+                                    "cabinet-office-folder-id")
 
-      expect(drive_uploader).to have_received(:share_file)
-                            .with("file-id",
-                                  %w[cabinet-office-1@example.com cabinet-office-2@example.com])
+      expect(file_distributor).to have_received(:share_file)
+                              .with("file-id",
+                                    %w[cabinet-office-1@example.com cabinet-office-2@example.com],
+                                    personalisation.merge(audience: "the Cabinet Office"))
     end
 
     it "uploads and shares a CSV for Data Labs" do
       described_class.call
 
-      expect(drive_uploader).to have_received(:upload_csv)
-                            .with("2020-04-30-1000-to-2020-05-01-1000-data-labs.csv",
-                                  "data-labs-data",
-                                  "data-labs-folder-id")
+      expect(file_distributor).to have_received(:upload_csv)
+                              .with("2020-04-30-1000-to-2020-05-01-1000-data-labs.csv",
+                                    "data-labs-data",
+                                    "data-labs-folder-id")
 
-      expect(drive_uploader).to have_received(:share_file)
-                            .with("file-id",
-                                  %w[data-labs@example.com])
+      expect(file_distributor).to have_received(:share_file)
+                              .with("file-id",
+                                    %w[data-labs@example.com],
+                                    personalisation.merge(audience: "GOV.UK Data Labs"))
     end
 
     it "uploads and shares a CSV for performance analysis" do
       described_class.call
 
-      expect(drive_uploader).to have_received(:upload_csv)
-                            .with("2020-04-30-1000-to-2020-05-01-1000-performance-analyst.csv",
-                                  "performance-analyst-data",
-                                  "performance-analyst-folder-id")
+      expect(file_distributor).to have_received(:upload_csv)
+                              .with("2020-04-30-1000-to-2020-05-01-1000-performance-analyst.csv",
+                                    "performance-analyst-data",
+                                    "performance-analyst-folder-id")
 
-      expect(drive_uploader).to have_received(:share_file)
-                            .with("file-id",
-                                  %w[performance-analyst@example.com])
+      expect(file_distributor).to have_received(:share_file)
+                              .with("file-id",
+                                    %w[performance-analyst@example.com],
+                                    personalisation.merge(audience: "GOV.UK performance analysis",
+                                                          responses_count: 2))
     end
 
     it "uploads and shares a CSV for a Third Party" do
       described_class.call
 
-      expect(drive_uploader).to have_received(:upload_csv)
-                            .with("2020-04-30-1000-to-2020-05-01-1000-third-party.csv",
-                                  "third-party-data",
-                                  "third-party-folder-id")
+      expect(file_distributor).to have_received(:upload_csv)
+                              .with("2020-04-30-1000-to-2020-05-01-1000-third-party.csv",
+                                    "third-party-data",
+                                    "third-party-folder-id")
 
-      expect(drive_uploader).to have_received(:share_file)
-                            .with("file-id",
-                                  %w[third-party@example.com])
+      expect(file_distributor).to have_received(:share_file)
+                              .with("file-id",
+                                    %w[third-party@example.com],
+                                    personalisation.merge(audience: "a third party polling organisation"))
     end
   end
 end

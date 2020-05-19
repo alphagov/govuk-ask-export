@@ -22,9 +22,15 @@ RSpec.describe "Drive export" do
       .with(body: %r{ /drive/v3/files/.*/permissions})
   end
 
+  let!(:notify_request) do
+    stub_request(:post, /api\.notifications\.service\.gov\.uk/)
+      .and_return(body: "{}")
+  end
+
   it "fetches surveys, uploads CSV files to drive and sets permissions on each" do
     ClimateControl.modify(SMART_SURVEY_API_TOKEN: "token",
                           SMART_SURVEY_API_TOKEN_SECRET: "token",
+                          NOTIFY_API_KEY: "#{SecureRandom.uuid}-#{SecureRandom.uuid}",
                           CABINET_OFFICE_DRIVE_FOLDER: "cabinet-office-folder-id",
                           CABINET_OFFICE_RECIPIENTS: "cabinet-office@example.com",
                           DATA_LABS_DRIVE_FOLDER: "data-labs-folder-id",
@@ -41,5 +47,6 @@ RSpec.describe "Drive export" do
     expect(smart_survey_request).to have_been_made
     expect(upload_request).to have_been_made.times(4)
     expect(permission_request).to have_been_made.times(4)
+    expect(notify_request).to have_been_made.times(4)
   end
 end

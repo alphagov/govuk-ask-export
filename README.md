@@ -41,6 +41,8 @@ The following environment variables should be configured:
   Console
 - `GOOGLE_CLIENT_EMAIL`
 - `GOOGLE_PRIVATE_KEY`
+- `NOTIFY_API_KEY` - API key for the GOV.UK Notify service to inform recipients
+  files are ready
 - `CABINET_OFFICE_DRIVE_FOLDER` - the file id of the Google Drive folder for
   storing Cabinet Office's CSV exports
 - `CABINET_OFFICE_EMAIL_RECIPIENTS` - a comma separated list of email addresses
