@@ -1,0 +1,171 @@
+---
+resource_types:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+resources:
+  - name: govuk-ask-export
+    type: git
+    icon: github-circle
+    source:
+      uri: https://github.com/alphagov/govuk-ask-export
+      branch: master
+  - name: export-schedule
+    type: time
+    icon: clock-outline
+    source:
+      # This will start a job at very close to 10am, if needed the job can be
+      # manually started any time until 12
+      start: 10:00 AM
+      stop: 12:00 PM
+      location: Europe/London
+  - name: gds-slack
+    type: slack-notification
+    source:
+      url: https://hooks.slack.com((slack-webhook-path))
+
+common_export_params: &common_export_params
+  GOOGLE_ACCOUNT_TYPE: sevice_account
+  GOOGLE_CLIENT_ID: ((google-client-id))
+  GOOGLE_CLIENT_EMAIL: ((google-client-email))
+  GOOGLE_PRIVATE_KEY: ((google-private-key))
+  NOTIFY_API_KEY: ((notify-api-key))
+  SECRET_KEY: ((secret-key))
+  SMART_SURVEY_API_TOKEN: ((smart-survey-api-token))
+  SMART_SURVEY_API_TOKEN_SECRET: ((smart-survey-api-token-secret))
+
+jobs:
+  - name: update-pipeline
+    plan:
+      - get: govuk-ask-export
+        trigger: true
+      - set_pipeline: govuk-ask-export
+        file: govuk-ask-export/concourse.yml
+
+  - name: scheduled-test-export
+    serial: true
+    plan:
+      - get: export-schedule
+        trigger: true
+      - put: gds-slack
+        params: &live_slack_notification
+          channel: '#govuk-corona-ask'
+          username: GOV.UK Ask Export
+          icon_emoji: ':concourse:'
+          silent: true
+          text: >
+            :alarm_clock: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|daily export>
+            of https://www.gov.uk/ask submissions has started
+      - get: govuk-ask-export
+      - task: drive_export
+        config: &export_task_config
+          image_resource:
+            type: registry-image
+            source:
+              repository: ruby
+              tag: 2.6.6
+          platform: linux
+          inputs:
+            - name: govuk-ask-export
+          outputs:
+            - name: export-output
+              path: govuk-ask-export/output
+          run:
+            dir: govuk-ask-export
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                set -e
+                bundle install --deployment
+                bundle exec rake drive_export
+          params:
+            <<: *common_export_params
+            SMART_SURVEY_LIVE: true
+            CABINET_OFFICE_DRIVE_FOLDER: ((cabinet-office-drive-folder))
+            CABINET_OFFICE_RECIPIENTS: ((cabinet-office-recipients))
+            DATA_LABS_DRIVE_FOLDER: ((data-labs-drive-folder))
+            DATA_LABS_RECIPIENTS: ((data-labs-recipients))
+            PERFORMANCE_ANALYST_DRIVE_FOLDER: ((performance-analyst-drive-folder))
+            PERFORMANCE_ANALYST_RECIPIENTS: ((performance-analyst-recipients))
+            THIRD_PARTY_DRIVE_FOLDER: ((third-party-drive-folder))
+            THIRD_PARTY_RECIPIENTS: ((third-party-recipients))
+    on_success:
+      put: gds-slack
+      params:
+        <<: *live_slack_notification
+        text: >
+          :thumbsup: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|daily export>
+          was successful. $TEXT_FILE_CONTENT.
+        text_file: export-output/slack-message.txt
+    on_failure:
+      put: gds-slack
+      params:
+        <<: *live_slack_notification
+        text: >
+          :thumbsdown: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|daily export>
+          has failed. Pinging <!subteam^S0145ESTQE8>.
+    on_error:
+      put: gds-slack
+      params:
+        <<: *live_slack_notification
+        text: >
+          :exclamation: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
+          errored. Pinging <!subteam^S0145ESTQE8>.
+
+  # This is a test job that can be run any time on demand with test smart survey
+  # data. This is to be used to test the export process and pipeline, and should
+  # be as similar to the scheduled task as reasonably possible.
+  - name: on-demand-test-export
+    serial: true
+    plan:
+      - put: gds-slack
+        params: &test_slack_notification
+          channel: '#govuk-corona-ask-notification-test'
+          username: GOV.UK Ask Export (test)
+          icon_emoji: ':concourse:'
+          silent: true
+          text: >
+            A <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
+            of https://www.gov.uk/ask submissions has started
+      - get: govuk-ask-export
+      - task: drive_export
+        config:
+          <<: *export_task_config
+          params:
+            <<: *common_export_params
+            # Do test exports over a long time period because there isn't much data
+            SINCE_TIME: 2020-05-01 10:00
+            CABINET_OFFICE_DRIVE_FOLDER: 16bEpSkt6-puUV4kA7G2Wnln3FJt5hDv5
+            CABINET_OFFICE_RECIPIENTS: kevin.dew@digital.cabinet-office.gov.uk
+            DATA_LABS_DRIVE_FOLDER: 1McFcg1tvganBm692Co_kKj5UiVK_u85-
+            DATA_LABS_RECIPIENTS: kevin.dew@digital.cabinet-office.gov.uk
+            PERFORMANCE_ANALYST_DRIVE_FOLDER: 1WdxRQ4nuVK_6yWc2b0N_6DOKn5PAVy75
+            PERFORMANCE_ANALYST_RECIPIENTS: kevin.dew@digital.cabinet-office.gov.uk
+            THIRD_PARTY_DRIVE_FOLDER: 1vfC3OXmrtwKTV32vGjofm3xF97cwiRam
+            THIRD_PARTY_RECIPIENTS: kevin.dew@digital.cabinet-office.gov.uk
+    on_success:
+      put: gds-slack
+      params:
+        <<: *test_slack_notification
+        text: >
+          :thumbsup: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
+          was successful. $TEXT_FILE_CONTENT.
+        text_file: export-output/slack-message.txt
+    on_failure:
+      put: gds-slack
+      params:
+        <<: *test_slack_notification
+        text: >
+          :thumbsdown: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
+          has failed. Pinging <!subteam^S0145ESTQE8>.
+    on_error:
+      put: gds-slack
+      params:
+        <<: *test_slack_notification
+        text: >
+          :exclamation: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
+          errored. Pinging <!subteam^S0145ESTQE8>.
