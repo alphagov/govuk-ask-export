@@ -19,6 +19,8 @@ module AskExport
       distribute_third_party_csv
 
       puts "All files uploaded to Google Drive and shared with partners"
+
+      File.write("#{output_directory}/slack-message.txt", slack_message, mode: "w")
     end
 
     private_class_method :new
@@ -86,6 +88,19 @@ module AskExport
 
     def recipients_from_env_var(name)
       ENV.fetch(name).split(",").map(&:strip)
+    end
+
+    def output_directory
+      ENV.fetch(
+        "OUTPUT_DIR",
+        File.expand_path("../../output", __dir__),
+      )
+    end
+
+    def slack_message
+      "From #{notification_personalisation[:since_time]} until " \
+      "#{notification_personalisation[:until_time]} there were " \
+      "#{notification_personalisation[:responses_count]} completed responses."
     end
   end
 end

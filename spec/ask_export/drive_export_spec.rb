@@ -25,11 +25,13 @@ RSpec.describe AskExport::DriveExport do
       allow(AskExport::Report).to receive(:new).and_return(report)
       allow(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
       allow(AskExport::FileDistributor).to receive(:new).and_return(file_distributor)
+      allow(File).to receive(:write)
     end
 
     let(:report) do
       # have a mix of reports to illustrate difference for audiences
       responses = [presented_survey_response(status: "completed"),
+                   presented_survey_response(status: "completed"),
                    presented_survey_response(status: "partial")]
       stubbed_report(responses: responses)
     end
@@ -50,7 +52,7 @@ RSpec.describe AskExport::DriveExport do
 
     let(:personalisation) do
       {
-        responses_count: 1,
+        responses_count: 2,
         since_time: "10:00am on 30 April 2020",
         until_time: "10:00am on 1 May 2020",
       }
@@ -96,7 +98,7 @@ RSpec.describe AskExport::DriveExport do
                               .with("file-id",
                                     %w[performance-analyst@example.com],
                                     personalisation.merge(audience: "GOV.UK performance analysis",
-                                                          responses_count: 2))
+                                                          responses_count: 3))
     end
 
     it "uploads and shares a CSV for a Third Party" do
@@ -111,6 +113,19 @@ RSpec.describe AskExport::DriveExport do
                               .with("file-id",
                                     %w[third-party@example.com],
                                     personalisation.merge(audience: "a third party polling organisation"))
+    end
+
+    it "creates a file for a slack message in the output directory" do
+      described_class.call
+
+      message = "From 10:00am on 30 April 2020 until 10:00am on 1 May 2020 " \
+        "there were 2 completed responses."
+
+      expect(File)
+        .to have_received(:write)
+        .with(%r{output/slack\-message\.txt\Z},
+              message,
+              mode: "w")
     end
   end
 end
