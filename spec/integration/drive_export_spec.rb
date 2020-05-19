@@ -19,6 +19,7 @@ RSpec.describe "Drive export" do
                             THIRD_PARTY_DRIVE_FOLDER: "third-party-folder-id",
                             THIRD_PARTY_RECIPIENTS: "third-party@example.com",
                             OUTPUT_DIR: tmpdir,
+                            SECRET_KEY: SecureRandom.uuid,
                             SINCE_TIME: "2020-05-06 20:00",
                             UNTIL_TIME: "2020-05-07 11:00") { example.run }
     end

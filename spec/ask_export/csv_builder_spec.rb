@@ -18,11 +18,17 @@ RSpec.describe AskExport::CsvBuilder do
   end
 
   describe "#data_labs" do
-    it "returns a csv of completed records formatted for data labs" do
-      expect(builder.data_labs).to eq(
-        "submission_time,region,question,question_format\n" \
-        "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n",
-      )
+    let(:secret_key) { SecureRandom.uuid }
+    let(:hashed_email) { Digest::SHA256.hexdigest("jane@example.com" + secret_key) }
+    let(:hashed_phone) { Digest::SHA256.hexdigest("+447123456789" + secret_key) }
+
+    it "returns a csv of completed records with hashed emails and phone numbers for Data Labs" do
+      ClimateControl.modify(SECRET_KEY: secret_key) do
+        expect(builder.data_labs).to eq(
+          "submission_time,region,question,question_format,hashed_email,hashed_phone\n" \
+          "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\",#{hashed_email},#{hashed_phone}\n",
+        )
+      end
     end
   end
 

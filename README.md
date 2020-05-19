@@ -59,6 +59,8 @@ The following environment variables should be configured:
   storing CSV exports for the third party
 - `THIRD_PARTY_EMAIL_RECIPIENTS` - a comma separated list of email addresses
   of third party colleagues who will be emailed upon a successful export
+- `SECRET_KEY` - a key that is used as salt to hashing functions to anonymise
+  personally identifiable information
 - `SINCE_TIME` (optional) - defaults to "10:00", can be changed to alter the time
   exports include data from. When this is a relative time (for example "10:00") it
   will be for the previous day, otherwise an absolute time can be set (for example
@@ -80,7 +82,7 @@ found in the Account > API Keys section.
 You can test a draft export with:
 
 ```
-SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
 ```
 
 There should now be files created in the `output` directory of this project
@@ -93,18 +95,25 @@ use ISO 8601 formatting such as "2020-05-01 10:00" or "10:00"
 For example:
 
 ```
-SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
 ```
 
 To perform the live export you need `SMART_SURVEY_LIVE` to equal `"true"`, for
 example:
 
 ```
-SMART_SURVEY_LIVE=true SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SMART_SURVEY_LIVE=true SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
 ```
 
 This should now have added files to the `output` directory (it will have
 overwritten any draft files).
+
+These examples all use a randomly generated secret key to hash user identifiable
+information for Data Labs. Using this randomly generated key means these hashes
+will change each run and not allowing comparing hashes between runs. To maintain
+the same hashes as the daily export run you will want to retrieve the secret
+key used in the daily export. This can be retrieved from the concourse pipeline
+with `gds cd secrets get cd-govuk-tools govuk-ask-export/secret-key`.
 
 ## Licence
 
