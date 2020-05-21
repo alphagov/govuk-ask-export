@@ -1,5 +1,3 @@
-require "aws-sdk-s3"
-
 module AskExport
   class FileExport
     def self.call
@@ -8,11 +6,10 @@ module AskExport
 
     def initialize
       @report = Report.new
+      @csv_builder = CsvBuilder.new(report)
     end
 
     def call
-      csv_builder = CsvBuilder.new(report)
-
       files = {
         output_path("cabinet-office") => csv_builder.cabinet_office,
         output_path("data-labs") => csv_builder.data_labs,
@@ -30,7 +27,7 @@ module AskExport
 
   private
 
-    attr_reader :report
+    attr_reader :report, :csv_builder
 
     def output_path(recipient)
       "#{output_directory}/#{report.filename_prefix}-#{recipient}.csv"

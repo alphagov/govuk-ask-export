@@ -7,12 +7,13 @@ RSpec::Core::RakeTask.new
 
 task default: %w[rubocop spec]
 
-desc "Run the process to export questions, upload them to S3 and notify stakeholders"
-task :s3_export do
-  AskExport::S3Export.call
+desc "Export questions from Smart Survey, upload output CSV files to Google " \
+  "Drive and share with recipients"
+task :drive_export do
+  AskExport::DriveExport.call
 end
 
-desc "Run the process to export questions and output them as files"
+desc "Export questions from Smart Survey and output CSV files"
 task :file_export do
   AskExport::FileExport.call
 end
