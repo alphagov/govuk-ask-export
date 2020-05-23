@@ -43,7 +43,16 @@ module AskExport
       # from Smart Survey with a "completed" status this seems to because
       # Smart Survey enforces required fields only on the client side
       required = %i[region question question_format name email phone]
-      required.any? { |field| answers[field].nil? } ? "partial" : "completed"
+      nil_fields = required.select { |field| answers[field].nil? }
+
+      if nil_fields.any?
+        warn "Response #{response[:id]} has a completed status but has null " \
+             "fields: #{nil_fields.join(', ')}"
+
+        "partial"
+      else
+        "completed"
+      end
     end
 
     def answers
