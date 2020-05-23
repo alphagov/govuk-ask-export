@@ -31,16 +31,16 @@ RSpec.describe AskExport::SurveyResponseFetcher do
         expect(request).to have_been_made
       end
 
-      it "delegates to ResponsePresenter to serialize the response from Smart Survey" do
+      it "delegates to ResponseSerialiser to serialise the response from Smart Survey" do
         record = smart_survey_row
         stub_smart_survey_api(body: [record])
-        presented_response = presented_survey_response
-        expect(described_class::ResponsePresenter).to receive(:call)
-                                                  .with(record)
-                                                  .and_return(presented_response)
+        serialised_response = serialised_survey_response
+        expect(described_class::ResponseSerialiser).to receive(:call)
+                                                   .with(record)
+                                                   .and_return(serialised_response)
 
         expect(described_class.call(since_time, until_time))
-          .to eql([presented_response])
+          .to eql([serialised_response])
       end
 
       it "requests multiple pages when there are more results than the page size" do

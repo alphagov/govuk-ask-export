@@ -30,7 +30,7 @@ module AskExport
       loop do
         body = JSON.parse(request_responses(page).body, symbolize_names: true)
 
-        responses += body.map { |entry| ResponsePresenter.call(entry) }
+        responses += body.map { |entry| ResponseSerialiser.call(entry) }
 
         puts "downloaded #{responses.count} responses"
 

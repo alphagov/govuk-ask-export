@@ -8,15 +8,17 @@ module AskExportHelper
       until: options[:until_time]&.to_i&.to_s,
       page: options[:page]&.to_s,
     }.compact
-    body = options.fetch(:body, smart_survey_response(50))
+
+    responses = smart_survey_response(50, environment: environment)
+    body = options.fetch(:body, responses)
 
     stub_request(:get, url)
       .with(query: hash_including(query))
       .to_return(body: JSON.generate(body), status: options.fetch(:status, 200))
   end
 
-  def smart_survey_response(items)
-    items.times.map { smart_survey_row }
+  def smart_survey_response(items, options = {})
+    items.times.map { smart_survey_row(options) }
   end
 
   def smart_survey_row(options = {})
@@ -44,7 +46,7 @@ module AskExportHelper
     row
   end
 
-  def presented_survey_response(options = {})
+  def serialised_survey_response(options = {})
     status = options.fetch(:status, "completed")
     completed = status == "completed"
     {
@@ -63,7 +65,7 @@ module AskExportHelper
     }
   end
 
-  def stubbed_report(responses: [presented_survey_response])
+  def stubbed_report(responses: [serialised_survey_response])
     report = AskExport::Report.new
     allow(report).to receive(:responses).and_return(responses)
     report
@@ -72,18 +74,15 @@ module AskExportHelper
 private
 
   def smart_survey_age_check_page(options)
+    choice = options[:status] == "disqualified" ? "No" : "Yes"
+
     {
       id: random_id,
       questions: [
-        {
-          id: random_id,
-          title: "Are you 18 or over?",
-          answers: [
-            {
-              choice_title: (options[:status] == "disqualified" ? "No" : "Yes"),
-            },
-          ],
-        },
+        smart_survey_answer(random_id,
+                            "Are you 18 or over?",
+                            choice,
+                            :choice_title),
       ],
     }
   end
@@ -93,42 +92,41 @@ private
 
     environment = options.fetch(:environment, :draft)
     config = AskExport::CONFIG[environment]
-
     {
       id: random_id,
       questions: [
-        {
-          id: config[:question_field_id],
-          title: "What is your question?",
-          answers: [{ value: options.fetch(:question, "A question?") }],
-        },
-        {
-          id: config[:name_field_id],
-          title: "What is your name?",
-          answers: [{ value: options.fetch(:name, "John Smith") }],
-        },
-        {
-          id: config[:region_field_id],
-          title: "Where do you live?",
-          answers: [{ choice_title: options.fetch(:region, "Yorkshire") }],
-        },
-        {
-          id: config[:email_field_id],
-          title: "What is your email address?",
-          answers: [{ value: options.fetch(:email, "me@example.com") }],
-        },
-        {
-          id: config[:phone_field_id],
-          title: "What is your phone number?",
-          answers: [{ value: options.fetch(:phone, "0789123456") }],
-        },
-        {
-          id: config[:question_format_field_id],
-          title: "How would you like to ask your question?",
-          answers: [{ choice_title: options.fetch(:question_format, "By video") }],
-        },
-      ],
+        smart_survey_answer(config[:question_field_id],
+                            "What is your question?",
+                            options.fetch(:question, "A question?"),
+                            :value),
+        smart_survey_answer(config[:name_field_id],
+                            "What is your name?",
+                            options.fetch(:name, "John Smith"),
+                            :value),
+        smart_survey_answer(config[:region_field_id],
+                            "Where do you live?",
+                            options.fetch(:region, "Yorkshire"),
+                            :choice_title),
+        smart_survey_answer(config[:email_field_id],
+                            "What is your email address?",
+                            options.fetch(:email, "me@example.com"),
+                            :value),
+        smart_survey_answer(config[:phone_field_id],
+                            "What is your phone number?",
+                            options.fetch(:phone, "0789123456"),
+                            :value),
+        smart_survey_answer(config[:question_format_field_id],
+                            "How would you like to ask your question?",
+                            options.fetch(:question_format, "By video"),
+                            :choice_title),
+      ].compact,
     }
+  end
+
+  def smart_survey_answer(id, title, answer, type)
+    return unless answer
+
+    { id: id, title: title, answers: [{ type => answer }] }
   end
 
   def random_id
