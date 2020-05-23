@@ -1,5 +1,5 @@
 module AskExport
-  class SurveyResponseFetcher::ResponsePresenter
+  class SurveyResponseFetcher::ResponseSerialiser
     # Consumers of these exports are already accustumed to a particular
     # time formatting, this is retained here so outputs remain consistent
     SMART_SURVEY_TIME_FORMATTING = "%d/%m/%Y %H:%M:%S".freeze

@@ -1,9 +1,9 @@
 RSpec.describe AskExport::CsvBuilder do
   let(:responses) do
     [
-      presented_survey_response(id: 1, region: "Scotland"),
-      presented_survey_response(id: 2, status: "partial"),
-      presented_survey_response(id: 3, status: "disqualified", client_id: 100),
+      serialised_survey_response(id: 1, region: "Scotland"),
+      serialised_survey_response(id: 2, status: "partial"),
+      serialised_survey_response(id: 3, status: "disqualified", client_id: 100),
     ]
   end
   let(:builder) { described_class.new(stubbed_report(responses: responses)) }

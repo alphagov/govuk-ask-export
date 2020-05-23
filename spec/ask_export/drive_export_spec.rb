@@ -30,9 +30,9 @@ RSpec.describe AskExport::DriveExport do
 
     let(:report) do
       # have a mix of reports to illustrate difference for audiences
-      responses = [presented_survey_response(status: "completed"),
-                   presented_survey_response(status: "completed"),
-                   presented_survey_response(status: "partial")]
+      responses = [serialised_survey_response(status: "completed"),
+                   serialised_survey_response(status: "completed"),
+                   serialised_survey_response(status: "partial")]
       stubbed_report(responses: responses)
     end
 

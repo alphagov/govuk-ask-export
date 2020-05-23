@@ -44,7 +44,7 @@ module AskExportHelper
     row
   end
 
-  def presented_survey_response(options = {})
+  def serialised_survey_response(options = {})
     status = options.fetch(:status, "completed")
     completed = status == "completed"
     {
@@ -63,7 +63,7 @@ module AskExportHelper
     }
   end
 
-  def stubbed_report(responses: [presented_survey_response])
+  def stubbed_report(responses: [serialised_survey_response])
     report = AskExport::Report.new
     allow(report).to receive(:responses).and_return(responses)
     report

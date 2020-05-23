@@ -1,16 +1,16 @@
-RSpec.describe AskExport::SurveyResponseFetcher::ResponsePresenter do
+RSpec.describe AskExport::SurveyResponseFetcher::ResponseSerialiser do
   describe ".call" do
-    it "presents a smart survey response" do
-      presented_response = presented_survey_response
-      options = presented_response.merge(
-        start_time: Time.zone.parse(presented_response[:start_time]),
-        submission_time: Time.zone.parse(presented_response[:submission_time]),
+    it "serialises a smart survey response" do
+      serialised_response = serialised_survey_response
+      options = serialised_response.merge(
+        start_time: Time.zone.parse(serialised_response[:start_time]),
+        submission_time: Time.zone.parse(serialised_response[:submission_time]),
       )
       expect(described_class.call(smart_survey_row(options)))
-        .to eq(presented_response)
+        .to eq(serialised_response)
     end
 
-    it "can present a draft smart survey response" do
+    it "can serialise a draft smart survey response" do
       options = { question: "Draft question?", environment: :draft }
       expect(described_class.call(smart_survey_row(options)))
         .to match(hash_including(question: "Draft question?"))

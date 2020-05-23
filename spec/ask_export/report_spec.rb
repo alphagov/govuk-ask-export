@@ -46,7 +46,7 @@ RSpec.describe AskExport::Report do
   describe "#responses" do
     it "delegates to SurveyResponseFetcher" do
       instance = described_class.new
-      responses = [presented_survey_response]
+      responses = [serialised_survey_response]
       expect(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .with(instance.since_time, instance.until_time)
@@ -57,9 +57,9 @@ RSpec.describe AskExport::Report do
 
   describe "#completed_responses" do
     it "returns only completed survey responses" do
-      completed_response = presented_survey_response(status: "completed")
-      partial_response = presented_survey_response(status: "partial")
-      disqualified_response = presented_survey_response(status: "disqualified")
+      completed_response = serialised_survey_response(status: "completed")
+      partial_response = serialised_survey_response(status: "partial")
+      disqualified_response = serialised_survey_response(status: "disqualified")
 
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
