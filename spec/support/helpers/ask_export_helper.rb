@@ -8,15 +8,17 @@ module AskExportHelper
       until: options[:until_time]&.to_i&.to_s,
       page: options[:page]&.to_s,
     }.compact
-    body = options.fetch(:body, smart_survey_response(50))
+
+    responses = smart_survey_response(50, environment: environment)
+    body = options.fetch(:body, responses)
 
     stub_request(:get, url)
       .with(query: hash_including(query))
       .to_return(body: JSON.generate(body), status: options.fetch(:status, 200))
   end
 
-  def smart_survey_response(items)
-    items.times.map { smart_survey_row }
+  def smart_survey_response(items, options = {})
+    items.times.map { smart_survey_row(options) }
   end
 
   def smart_survey_row(options = {})
