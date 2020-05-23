@@ -17,16 +17,10 @@ module AskExport
         id: response[:id],
         client_id: client_id,
         user_agent: response[:user_agent],
-        status: response[:status],
+        status: status,
         start_time: format_time(response[:date_started]),
         submission_time: format_time(response[:date_ended]),
-        region: fetch_choice_answer(:region_field_id),
-        question: fetch_value_answer(:question_field_id),
-        question_format: fetch_choice_answer(:question_format_field_id),
-        name: fetch_value_answer(:name_field_id),
-        email: fetch_value_answer(:email_field_id),
-        phone: fetch_value_answer(:phone_field_id),
-      }
+      }.merge(answers)
     end
 
     private_class_method :new
@@ -40,6 +34,27 @@ module AskExport
 
       response[:variables].find { |v| v[:label] == "clientID" }
                           .then { |v| v.to_h[:value] }
+    end
+
+    def status
+      return response[:status] unless response[:status] == "completed"
+
+      # We've had situations where an incomplete survey response is returned
+      # from Smart Survey with a "completed" status this seems to because
+      # Smart Survey enforces required fields only on the client side
+      required = %i[region question question_format name email phone]
+      required.any? { |field| answers[field].nil? } ? "partial" : "completed"
+    end
+
+    def answers
+      @answers ||= {
+        region: fetch_choice_answer(:region_field_id),
+        question: fetch_value_answer(:question_field_id),
+        question_format: fetch_choice_answer(:question_format_field_id),
+        name: fetch_value_answer(:name_field_id),
+        email: fetch_value_answer(:email_field_id),
+        phone: fetch_value_answer(:phone_field_id),
+      }
     end
 
     def format_time(time)

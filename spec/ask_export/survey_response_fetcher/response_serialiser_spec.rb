@@ -40,5 +40,14 @@ RSpec.describe AskExport::SurveyResponseFetcher::ResponseSerialiser do
       expect(described_class.call(smart_survey_row(client_id: "947770117.1576778690")))
         .to match(hash_including(client_id: "947770117.1576778690"))
     end
+
+    it "rebrands an incomplete 'complete' response as a partial response" do
+      row = smart_survey_row(status: "completed",
+                             email: nil,
+                             phone: nil,
+                             question_format: nil)
+      expect(described_class.call(row))
+        .to match(hash_including(status: "partial"))
+    end
   end
 end
