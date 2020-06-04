@@ -17,3 +17,8 @@ desc "Export questions from Smart Survey and output CSV files"
 task :file_export do
   AskExport::FileExport.call
 end
+
+desc "Export a days questions from Smart Survey and import the analytics data into Big Query"
+task :big_query_export do
+  AskExport::BigQueryExport.call
+end
