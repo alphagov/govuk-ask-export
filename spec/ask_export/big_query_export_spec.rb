@@ -48,6 +48,11 @@ RSpec.describe AskExport::BigQueryExport do
           .with(big_query_table, report.responses)
         described_class.call
       end
+
+      it "can accept an injected report" do
+        described_class.call(report)
+        expect(AskExport::Report).not_to have_received(:new)
+      end
     end
 
     context "when the report isn't for a single day 10am to 10am" do

@@ -2,12 +2,12 @@ module AskExport
   class DriveExport
     READABLE_TIME_FORMAT = "%-l:%M%P on %-d %B %Y".freeze
 
-    def self.call
-      new.call
+    def self.call(*args)
+      new(*args).call
     end
 
-    def initialize
-      @report = Report.new
+    def initialize(report = Report.new)
+      @report = report
       @file_distributor = FileDistributor.new
       @csv_builder = CsvBuilder.new(report)
     end

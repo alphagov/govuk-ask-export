@@ -6,8 +6,8 @@ module AskExport
       new(*args).call
     end
 
-    def initialize
-      @report = Report.new
+    def initialize(report = Report.new)
+      @report = report
       @big_query = Google::Cloud::Bigquery.new(project: "govuk-bigquery-analytics")
     end
 

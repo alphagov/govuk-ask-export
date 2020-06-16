@@ -127,5 +127,10 @@ RSpec.describe AskExport::DriveExport do
               message,
               mode: "w")
     end
+
+    it "can accept an injected report" do
+      described_class.call(report)
+      expect(AskExport::Report).not_to have_received(:new)
+    end
   end
 end
