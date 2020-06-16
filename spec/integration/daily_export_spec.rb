@@ -1,6 +1,6 @@
 require "tmpdir"
 
-RSpec.describe "Drive export" do
+RSpec.describe "Daily export" do
   around do |example|
     expect { example.run }.to output.to_stdout
   end
@@ -20,33 +20,31 @@ RSpec.describe "Drive export" do
                             THIRD_PARTY_RECIPIENTS: "third-party@example.com",
                             OUTPUT_DIR: tmpdir,
                             SECRET_KEY: SecureRandom.uuid,
-                            SINCE_TIME: "2020-05-06 20:00",
-                            UNTIL_TIME: "2020-05-07 11:00") { example.run }
+                            SINCE_TIME: "2020-05-06 10:00",
+                            UNTIL_TIME: "2020-05-07 10:00") { example.run }
     end
   end
 
   before do
     stub_drive_authentication
-    Rake::Task["drive_export"].reenable
+    stub_drive_set_permissions
+    stub_big_query_authentication
+    stub_big_query_dataset
+    stub_big_query_table
+    stub_post_notify
+
+    Rake::Task["daily_export"].reenable
   end
 
   let!(:smart_survey_request) { stub_smart_survey_api }
-  let!(:upload_request) { stub_drive_upload }
-  let!(:permission_request) { stub_drive_set_permissions }
-  let!(:notify_request) { stub_post_notify }
+  let!(:drive_upload_request) { stub_drive_upload }
+  let!(:big_query_insert_request) { stub_big_query_insert_all }
 
-  it "fetches surveys, uploads CSV files to drive and sets permissions on each" do
-    Rake::Task["drive_export"].invoke
+  it "fetches surveys, uploads CSV files to drive and inserts to Big Query" do
+    Rake::Task["daily_export"].invoke
 
-    expect(smart_survey_request).to have_been_made
-    expect(upload_request).to have_been_made.times(4)
-    expect(permission_request).to have_been_made.times(4)
-    expect(notify_request).to have_been_made.times(4)
-  end
-
-  it "outputs a text file for use in creating a Concourse Slack notifcation" do
-    Rake::Task["drive_export"].invoke
-
-    expect(File).to exist(File.join(ENV["OUTPUT_DIR"], "slack-message.txt"))
+    expect(smart_survey_request).to have_been_made.once
+    expect(drive_upload_request).to have_been_made.at_least_once
+    expect(big_query_insert_request).to have_been_made
   end
 end

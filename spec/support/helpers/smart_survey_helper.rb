@@ -1,4 +1,4 @@
-module AskExportHelper
+module SmartSurveyHelper
   def stub_smart_survey_api(options = {})
     environment = options.fetch(:environment, :draft)
     config = AskExport::CONFIG[environment]

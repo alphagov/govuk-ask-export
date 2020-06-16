@@ -11,39 +11,16 @@ RSpec.describe "Big Query export" do
   end
 
   before do
-    # Some rather hacky short circuits to bypass google authentication
-    allow(Google::Cloud::Bigquery::Credentials)
-      .to receive(:default)
-      .and_return({ "private_key": OpenSSL::PKey::RSA.generate(1024).to_s })
-
-    stub_request(:post, "https://oauth2.googleapis.com/token")
-      .and_return(body: "{}", headers: { content_type: "application/json" })
-
-    stub_dataset_request
-    stub_any_table_request
+    stub_big_query_authentication
+    stub_big_query_dataset
+    stub_big_query_table
 
     Rake::Task["big_query_export"].reenable
   end
 
-  def stub_dataset_request
-    stub_request(:get, /bigquery.googleapis.com.*\/datasets\/ask_test_dataset$/)
-      .and_return(body: { datasetReference: { projectId: "123", datasetId: "123" } }.to_json,
-                  headers: { content_type: "application/json" })
-  end
-
-  def stub_any_table_request
-    response = { tableReference: { projectId: "123", datasetId: "123", tableId: "123" } }
-    stub_request(:any, /bigquery.googleapis.com.*\/tables/)
-      .and_return(body: response.to_json,
-                  headers: { content_type: "application/json" })
-  end
-
   let!(:smart_survey_request) { stub_smart_survey_api }
 
-  let!(:big_query_insert_request) do
-    stub_request(:post, /bigquery.googleapis.com.*\/insertAll$/)
-      .and_return(body: "{}", headers: { content_type: "application/json" })
-  end
+  let!(:big_query_insert_request) { stub_big_query_insert_all }
 
   it "fetches surveys and uploads data to Biq Query" do
     Rake::Task["big_query_export"].invoke

@@ -22,3 +22,11 @@ desc "Export a days questions from Smart Survey and import the analytics data in
 task :big_query_export do
   AskExport::BigQueryExport.call
 end
+
+desc "Daily export job that is expected to run on a schedule. This downloads " \
+  "From Smart Survey, creates CSV files in Google Drive, and populates Big Query"
+task :daily_export do
+  report = AskExport::Report.new
+  AskExport::DriveExport.call(report)
+  AskExport::BigQueryExport.call(report)
+end
