@@ -1,9 +1,5 @@
 module AskExport
   class SurveyResponseFetcher::ResponseSerialiser
-    # Consumers of these exports are already accustumed to a particular
-    # time formatting, this is retained here so outputs remain consistent
-    SMART_SURVEY_TIME_FORMATTING = "%d/%m/%Y %H:%M:%S".freeze
-
     def self.call(*args)
       new(*args).call
     end
@@ -18,8 +14,8 @@ module AskExport
         client_id: client_id,
         user_agent: response[:user_agent],
         status: status,
-        start_time: format_time(response[:date_started]),
-        submission_time: format_time(response[:date_ended]),
+        start_time: Time.zone.iso8601(response[:date_started]),
+        end_time: Time.zone.iso8601(response[:date_ended]),
       }.merge(answers)
     end
 
@@ -64,10 +60,6 @@ module AskExport
         email: fetch_value_answer(:email_field_id),
         phone: fetch_value_answer(:phone_field_id),
       }
-    end
-
-    def format_time(time)
-      Time.zone.iso8601(time).strftime(SMART_SURVEY_TIME_FORMATTING)
     end
 
     def fetch_value_answer(field_id)

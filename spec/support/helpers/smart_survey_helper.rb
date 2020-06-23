@@ -1,4 +1,4 @@
-module AskExportHelper
+module SmartSurveyHelper
   def stub_smart_survey_api(options = {})
     environment = options.fetch(:environment, :draft)
     config = AskExport::CONFIG[environment]
@@ -29,7 +29,7 @@ module AskExportHelper
       id: options.fetch(:id, random_id),
       survey_id: config[:survey_id],
       date_started: options.fetch(:start_time, Time.zone.now).utc.iso8601,
-      date_ended: options.fetch(:submission_time, Time.zone.now).utc.iso8601,
+      date_ended: options.fetch(:end_time, Time.zone.now).utc.iso8601,
       status: options.fetch(:status, "completed"),
       user_agent: options.fetch(:user_agent, "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)"),
       pages: [smart_survey_age_check_page(options),
@@ -54,8 +54,8 @@ module AskExportHelper
       client_id: options[:client_id],
       user_agent: "NCSA Mosaic/3.0 (Windows 95)",
       status: status,
-      start_time: "01/05/2020 08:55:00",
-      submission_time: "01/05/2020 09:00:00",
+      start_time: Time.zone.parse("2020-05-01 08:55:00"),
+      end_time: Time.zone.parse("2020-05-01 09:00:00"),
       region: completed ? options.fetch(:region, "Greater London") : nil,
       question: completed ? "A question?" : nil,
       question_format: completed ? "In writing, to be read out at the press conference" : nil,

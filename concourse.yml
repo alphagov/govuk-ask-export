@@ -60,7 +60,7 @@ jobs:
             :alarm_clock: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|daily export>
             of https://www.gov.uk/ask submissions has started
       - get: govuk-ask-export
-      - task: drive_export
+      - task: daily_export
         config: &export_task_config
           image_resource:
             type: registry-image
@@ -81,7 +81,7 @@ jobs:
               - |
                 set -e
                 bundle install --deployment
-                bundle exec rake drive_export
+                bundle exec rake daily_export
           params:
             <<: *common_export_params
             SMART_SURVEY_LIVE: true
