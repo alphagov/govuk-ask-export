@@ -135,6 +135,15 @@ jobs:
       - task: drive_export
         config:
           <<: *export_task_config
+          run:
+            dir: govuk-ask-export
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                set -e
+                bundle install --deployment
+                bundle exec rake file_export
           params:
             <<: *common_export_params
             # Do test exports over a long time period because there isn't much data
