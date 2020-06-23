@@ -45,7 +45,7 @@ jobs:
       - set_pipeline: govuk-ask-export
         file: govuk-ask-export/concourse.yml
 
-  - name: scheduled-test-export
+  - name: scheduled-export
     serial: true
     plan:
       - get: export-schedule
