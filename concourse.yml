@@ -45,6 +45,13 @@ jobs:
       - set_pipeline: govuk-ask-export
         file: govuk-ask-export/concourse.yml
 
+  # This task runs each day at 10am and does the following things:
+  #
+  # - Export data from Smart Survey from 10am the previous day until 10 am the
+  #   current day
+  # - Split that into CSV files that are uploaded to Google Drive
+  # - Share those files with Google Drive API and email those users via Notify
+  # - Export performance analyst data to Big Query
   - name: scheduled-export
     serial: true
     plan:
