@@ -178,3 +178,41 @@ jobs:
         text: >
           :exclamation: The <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|test export>
           errored. Pinging <!subteam^S0145ESTQE8>.
+
+  # This task allows exporting the previous days (10am to 10am) data from
+  # Smary Survey to Big Query. It will erase the existing data and replace it.
+  # This task is useful to use if there was a problem with the big query export
+  # and you don't want to run the file export as well.
+  - name: on-demand-biq-query-export
+    serial: true
+    plan:
+      - get: govuk-ask-export
+      - task: big_query_export
+        config: &big_query_export_task_config
+          <<: *export_task_config
+          run:
+            dir: govuk-ask-export
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                set -e
+                bundle install --deployment
+                bundle exec rake big_query_export
+          params:
+            <<: *common_export_params
+            SMART_SURVEY_LIVE: true
+
+  # This task allows you to test running a big query export by using the
+  # Smart Survey draft data and writing to our test Big Query dataset.
+  # Normally there are 0 results in Smart Survey for a single day so this will
+  # likely create an empty table.
+  - name: on-demand-biq-query-test-export
+    serial: true
+    plan:
+      - get: govuk-ask-export
+      - task: big_query_export
+        config:
+          <<: *big_query_export_task_config
+          params:
+            <<: *common_export_params
