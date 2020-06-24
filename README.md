@@ -1,5 +1,8 @@
 # GOV.UK Ask Export
 
+**⚠️ This repository has been archived following the conclusion of the daily
+coronavirus press conferences on the 23rd June 2020.**
+
 A tool for working with the data of the Smart Survey that powers
 https://www.gov.uk/ask. This downloads data from Smart Survey, splits it into
 CSV files that are shared with recipients and uploads performance analyst data
