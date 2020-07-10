@@ -10,9 +10,6 @@ Rake.application.load_rakefile
 
 RSpec.configure do |config|
   include ActiveSupport::Testing::TimeHelpers
-  include BigQueryHelper
-  include DriveHelper
-  include NotifyHelper
   include SmartSurveyHelper
 
   config.disable_monkey_patching!
