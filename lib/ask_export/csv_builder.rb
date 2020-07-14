@@ -17,7 +17,8 @@ module AskExport
                 :region,
                 :name,
                 :email,
-                :phone)
+                :phone,
+                :question_format)
     end
 
     def data_labs
@@ -30,6 +31,7 @@ module AskExport
                 :submission_time,
                 :region,
                 :question,
+                :question_format,
                 :hashed_email,
                 :hashed_phone)
     end
@@ -49,7 +51,8 @@ module AskExport
                 :id,
                 :submission_time,
                 :region,
-                :question)
+                :question,
+                :question_format)
     end
 
   private
