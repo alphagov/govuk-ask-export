@@ -33,11 +33,10 @@ RSpec.describe AskExport::SurveyResponseFetcher::ResponseSerialiser do
       row = smart_survey_row(status: "completed",
                              id: 10,
                              email: nil,
-                             phone: nil,
-                             question_format: nil)
+                             phone: nil)
       result = nil
       warning = "Response 10 has a completed status but has null " \
-                "fields: question_format, email, phone\n"
+                "fields: email, phone\n"
       expect { result = described_class.call(row) }
         .to output(warning).to_stderr
       expect(result).to match(hash_including(status: "partial"))
