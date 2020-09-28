@@ -58,6 +58,7 @@ module SmartSurveyHelper
       end_time: Time.zone.parse("2020-05-01 09:00:00"),
       region: completed ? options.fetch(:region, "Greater London") : nil,
       question: completed ? "A question?" : nil,
+      question_format: completed ? "In writing, to be read out at the press conference" : nil,
       name: completed ? "Jane Doe" : nil,
       email: completed ? "jane@example.com" : nil,
       phone: completed ? "+447123456789" : nil,
@@ -114,6 +115,10 @@ private
                             "What is your phone number?",
                             options.fetch(:phone, "0789123456"),
                             :value),
+        smart_survey_answer(config[:question_format_field_id],
+                            "How would you like to ask your question?",
+                            options.fetch(:question_format, "By video"),
+                            :choice_title),
       ].compact,
     }
   end

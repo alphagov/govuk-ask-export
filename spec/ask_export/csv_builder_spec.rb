@@ -11,8 +11,8 @@ RSpec.describe AskExport::CsvBuilder do
   describe "#cabinet_office" do
     it "returns a csv of completed records formatted for cabinet office" do
       expect(builder.cabinet_office).to eq(
-        "id,submission_time,region,name,email,phone\n" \
-        "1,01/05/2020 09:00:00,Scotland,Jane Doe,jane@example.com,+447123456789\n",
+        "id,submission_time,region,name,email,phone,question_format\n" \
+        "1,01/05/2020 09:00:00,Scotland,Jane Doe,jane@example.com,+447123456789,\"In writing, to be read out at the press conference\"\n",
       )
     end
   end
@@ -25,8 +25,8 @@ RSpec.describe AskExport::CsvBuilder do
     it "returns a csv of completed records with hashed emails and phone numbers for Data Labs" do
       ClimateControl.modify(SECRET_KEY: secret_key) do
         expect(builder.data_labs).to eq(
-          "submission_time,region,question,hashed_email,hashed_phone\n" \
-          "01/05/2020 09:00:00,Scotland,A question?,#{hashed_email},#{hashed_phone}\n",
+          "submission_time,region,question,question_format,hashed_email,hashed_phone\n" \
+          "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\",#{hashed_email},#{hashed_phone}\n",
         )
       end
     end
@@ -46,8 +46,8 @@ RSpec.describe AskExport::CsvBuilder do
   describe "#third_party" do
     it "returns a csv of completed records formatted for a third party" do
       expect(builder.third_party).to eq(
-        "id,submission_time,region,question\n" \
-        "1,01/05/2020 09:00:00,Scotland,A question?\n",
+        "id,submission_time,region,question,question_format\n" \
+        "1,01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\"\n",
       )
     end
   end
