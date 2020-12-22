@@ -20,5 +20,10 @@ module AskExport
                                  supports_all_drives: true,
                                  content_type: "text/csv")
     end
+
+    def self.folder_id_from_env(name)
+      env_var_name = "FOLDER_ID_#{name.upcase.gsub(/-/, '_')}"
+      ENV[env_var_name]
+    end
   end
 end

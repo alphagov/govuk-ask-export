@@ -14,4 +14,13 @@ RSpec.describe AskExport::GoogleDrive do
       end
     end
   end
+
+  describe "getting the folder id from an env var" do
+    it "returns an folder id" do
+      ClimateControl.modify FOLDER_ID_SOME_NAME: "folder-id" do
+        folder_id = AskExport::GoogleDrive.folder_id_from_env("some-name")
+        expect(folder_id).to eq("folder-id")
+      end
+    end
+  end
 end
