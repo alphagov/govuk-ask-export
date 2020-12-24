@@ -23,21 +23,33 @@ RSpec.describe AskExport::FileExport do
     end
 
     it "writes files for each partner named with current date" do
-      described_class.call
+      files = described_class.call
 
-      {
-        "cabinet-office" => csv_builder.cabinet_office,
-        "data-labs" => csv_builder.data_labs,
-        "performance-analyst" => csv_builder.performance_analyst,
-        "third-party" => csv_builder.third_party,
-      }.each do |filename_suffix, data|
-        expected_file = "../../output/2020-04-30-1000-to-2020-05-01-1000-#{filename_suffix}.csv"
-        expect(File)
-          .to have_received(:write)
-          .with(File.expand_path(expected_file, __dir__),
-                data,
-                mode: "w")
+      expected_files = {
+        "cabinet-office" => {
+          data: csv_builder.cabinet_office,
+          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv",
+        },
+        "data-labs" => {
+          data: csv_builder.data_labs,
+          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-data-labs.csv",
+        },
+        "performance-analyst" => {
+          data: csv_builder.performance_analyst,
+          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-performance-analyst.csv",
+        },
+        "third-party" => {
+          data: csv_builder.third_party,
+          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-third-party.csv",
+        },
+      }
+
+      expected_files.each do |_name, file|
+        file[:path] = File.expand_path(file[:path], __dir__)
+        expect(File).to have_received(:write).with(file[:path], file[:data], mode: "w")
       end
+
+      expect(files).to eq(expected_files)
     end
   end
 end

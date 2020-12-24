@@ -11,16 +11,17 @@ module AskExport
 
     def call
       files = {
-        output_path("cabinet-office") => csv_builder.cabinet_office,
-        output_path("data-labs") => csv_builder.data_labs,
-        output_path("performance-analyst") => csv_builder.performance_analyst,
-        output_path("third-party") => csv_builder.third_party,
+        "cabinet-office" => { data: csv_builder.cabinet_office, path: output_path("cabinet-office") },
+        "data-labs" => { data: csv_builder.data_labs, path: output_path("data-labs") },
+        "performance-analyst" => { data: csv_builder.performance_analyst, path: output_path("performance-analyst") },
+        "third-party" => { data: csv_builder.third_party, path: output_path("third-party") },
       }
 
-      files.each { |path, data| File.write(path, data, mode: "w") }
-      relative_paths = files.keys.map { |path| relative_to_cwd(path) }
+      files.each { |_, file| File.write(file[:path], file[:data], mode: "w") }
+      relative_paths = files.values.map { |file| relative_to_cwd(file[:path]) }
 
       puts "CSV files have been output to: #{relative_paths.join(', ')}"
+      files
     end
 
     private_class_method :new
