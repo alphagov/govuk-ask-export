@@ -1,0 +1,108 @@
+---
+resource_types:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+resources:
+  - name: govuk-ask-export
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/alphagov/govuk-ask-export
+      branch: master
+  - name: export-schedule
+    type: time
+    icon: timer 
+    source:
+      start: 12:01 AM
+      stop: 12:05 AM
+      location: Europe/London
+  - name: gds-slack
+    type: slack-notification
+    icon: slack
+    source:
+      url: https://hooks.slack.com((slack-webhook-path))
+
+jobs:
+  - name: update-pipeline
+    plan:
+      - get: govuk-ask-export
+        trigger: true
+      - set_pipeline: govuk-ask-export
+        file: govuk-ask-export/concourse.yml
+ 
+  # - Export data from Smart Survey
+  # - Split that into CSV files that are uploaded to Google Drive
+  - name: scheduled-export
+    serial: true
+    plan:
+      - get: export-schedule
+        trigger: true
+      - get: govuk-ask-export
+      - put: gds-slack
+        params: &live_slack_notification
+          channel: '#govuk-smart-answers-devs'
+          username: GOV.UK Ask Export
+          icon_emoji: ':concourse:'
+          silent: true
+          always_notify: true
+          text: >
+            :alarm_clock: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Daily export> of questions from Survey Monkey to Google Drive started
+      - task: file-export
+        config:
+          image_resource:
+            type: registry-image
+            source:
+              repository: ruby
+              tag: 2.6.6
+          platform: linux
+          inputs:
+            - name: govuk-ask-export
+          outputs:
+            - name: export-output
+              path: govuk-ask-export/output
+          run:
+            dir: govuk-ask-export
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                set -e
+                bundle install --deployment
+                bundle exec rake file_export_and_upload
+          params:
+            SECRET_KEY: ((secret-key))
+            SINCE_TIME: 00:00
+            UNTIL_TIME: 00:00
+            SMART_SURVEY_API_TOKEN: ((smart-survey-api-token))
+            SMART_SURVEY_API_TOKEN_SECRET: ((smart-survey-api-token-secret))
+            SMART_SURVEY_LIVE: true
+            GOOGLE_ACCOUNT_TYPE: service_account
+            GOOGLE_CLIENT_ID: ((google-client-id))
+            GOOGLE_CLIENT_EMAIL: ((google-client-email))
+            GOOGLE_PRIVATE_KEY: ((google-private-key))
+            FOLDER_ID_CABINET_OFFICE: ((google-drive-folder-id-cabinet-office))
+            FOLDER_ID_DATA_LABS: ((google-drive-folder-id-data-labs))
+            FOLDER_ID_PERFORMANCE_ANALYST: ((google-drive-folder-id-performance-analyst))
+            FOLDER_ID_THIRD_PARTY: ((google-drive-folder-id-third-party))
+        on_success:
+          put: gds-slack
+          params:
+            <<: *live_slack_notification
+            text: >
+              :white_check_mark: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Export successful>
+        on_failure:
+          put: gds-slack
+          params:
+            <<: *live_slack_notification
+            text: >
+              :x: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Export failed>. <!here>
+        on_error:
+          put: gds-slack
+          params:
+            <<: *live_slack_notification
+            text: >
+              :warning: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Error with export>. <!here>
