@@ -1,11 +1,12 @@
 RSpec.describe AskExport::CsvBuilder do
   let(:responses) do
     [
-      serialised_survey_response(id: 1, region: "Scotland"),
-      serialised_survey_response(id: 2, status: "partial"),
-      serialised_survey_response(id: 3, status: "disqualified", client_id: 100),
+      report_response(id: 1, region: "Scotland"),
+      report_response(id: 2, status: "partial"),
+      report_response(id: 3, status: "disqualified", client_id: 100),
     ]
   end
+
   let(:builder) { described_class.new(stubbed_report(responses: responses)) }
 
   describe "#cabinet_office" do
@@ -18,17 +19,11 @@ RSpec.describe AskExport::CsvBuilder do
   end
 
   describe "#data_labs" do
-    let(:secret_key) { SecureRandom.uuid }
-    let(:hashed_email) { Digest::SHA256.hexdigest("jane@example.com" + secret_key) }
-    let(:hashed_phone) { Digest::SHA256.hexdigest("+447123456789" + secret_key) }
-
     it "returns a csv of completed records with hashed emails and phone numbers for Data Labs" do
-      ClimateControl.modify(SECRET_KEY: secret_key) do
-        expect(builder.data_labs).to eq(
-          "submission_time,region,question,question_format,hashed_email,hashed_phone\n" \
-          "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\",#{hashed_email},#{hashed_phone}\n",
-        )
-      end
+      expect(builder.data_labs).to eq(
+        "submission_time,region,question,question_format,hashed_email,hashed_phone\n" \
+        "01/05/2020 09:00:00,Scotland,A question?,\"In writing, to be read out at the press conference\",8c87b489ce35cf2e2f39f80e282cb2e804932a56a213983eeeb428407d43b52d,8cc62e120e9efbf2ab8c87b35b35205f3934760a2ea8ee2c249888e7f6b6daad\n",
+      )
     end
   end
 

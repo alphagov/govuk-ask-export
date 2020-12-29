@@ -45,27 +45,41 @@ RSpec.describe AskExport::Report do
 
   describe "#responses" do
     it "delegates to SurveyResponseFetcher" do
+      secret_key = "secret"
       instance = described_class.new
-      responses = [serialised_survey_response]
+      responses = [serialised_survey_response({ id: 1 })]
+      expected_responses = [report_response({ id: 1 }, secret_key)]
+
       expect(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .with(instance.since_time, instance.until_time)
         .and_return(responses)
-      expect(instance.responses).to eq(responses)
+
+      ClimateControl.modify(SECRET_KEY: secret_key) do
+        expect(instance.responses).to eq(expected_responses)
+      end
     end
   end
 
   describe "#completed_responses" do
     it "returns only completed survey responses" do
-      completed_response = serialised_survey_response(status: "completed")
-      partial_response = serialised_survey_response(status: "partial")
-      disqualified_response = serialised_survey_response(status: "disqualified")
+      secret_key = "secret"
+
+      responses = [
+        serialised_survey_response(status: "completed", id: 1),
+        serialised_survey_response(status: "partial"),
+        serialised_survey_response(status: "disqualified"),
+      ]
+
+      expected_responses = [report_response({ id: 1 }, secret_key)]
 
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
-        .and_return([completed_response, partial_response, disqualified_response])
+        .and_return(responses)
 
-      expect(described_class.new.completed_responses).to eq([completed_response])
+      ClimateControl.modify(SECRET_KEY: secret_key) do
+        expect(described_class.new.completed_responses).to eq(expected_responses)
+      end
     end
   end
 
