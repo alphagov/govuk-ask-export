@@ -5,22 +5,33 @@ module AskExport
     end
 
     def initialize
+      config_path = File.expand_path("../../config/pipelines.yml", __dir__)
+
+      @pipelines = Pipeline.load_all(config_path)
       @report = Report.new
-      @csv_builder = CsvBuilder.new(report)
+      @csv_builder = CsvBuilder.new
     end
 
     def call
-      files = {
-        "cabinet-office" => { data: csv_builder.cabinet_office, path: output_path("cabinet-office") },
-        "data-labs" => { data: csv_builder.data_labs, path: output_path("data-labs") },
-        "performance-analyst" => { data: csv_builder.performance_analyst, path: output_path("performance-analyst") },
-        "third-party" => { data: csv_builder.third_party, path: output_path("third-party") },
-      }
+      files = {}
 
-      files.each { |_, file| File.write(file[:path], file[:data], mode: "w") }
-      relative_paths = files.values.map { |file| relative_to_cwd(file[:path]) }
+      @pipelines.each do |pipeline|
+        responses = if pipeline.only_completed
+                      @report.completed_responses
+                    else
+                      @report.responses
+                    end
 
-      puts "CSV files have been output to: #{relative_paths.join(', ')}"
+        data = csv_builder.build_csv(responses, *pipeline.fields)
+        filepath = output_path(pipeline.name)
+
+        File.write(filepath, data, mode: "w")
+
+        puts "CSV file for #{pipeline.name} output to: #{filepath}"
+
+        files[pipeline.name] = { path: filepath }
+      end
+
       files
     end
 
