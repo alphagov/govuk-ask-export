@@ -76,7 +76,7 @@ module SmartSurveyHelper
       submission_time: "01/05/2020 09:00:00",
       hashed_email: completed ? Digest::SHA256.hexdigest("jane@example.com" + secret_key) : nil,
       hashed_phone: completed ? Digest::SHA256.hexdigest("+447123456789" + secret_key) : nil,
-    })
+    }.compact)
   end
 
   def stubbed_report(responses: [serialised_survey_response])
