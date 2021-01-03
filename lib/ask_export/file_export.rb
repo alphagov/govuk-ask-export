@@ -8,52 +8,33 @@ module AskExport
       config_path = File.expand_path("../../config/pipelines.yml", __dir__)
 
       @pipelines = Pipeline.load_all(config_path)
-      @report = Report.new
-      @csv_builder = CsvBuilder.new
+      @exporters = Exporters.load_all
+      @report_builder = ReportBuilder.new
     end
 
     def call
-      files = {}
-
       @pipelines.each do |pipeline|
-        responses = if pipeline.only_completed
-                      @report.completed_responses
-                    else
-                      @report.responses
-                    end
+        report = @report_builder.build(only_completed: pipeline.only_completed)
 
-        data = csv_builder.build_csv(responses, *pipeline.fields)
-        filepath = output_path(pipeline.name)
+        filename = report.filename(pipeline.name, "csv")
+        data = report.to_csv(pipeline.fields)
 
-        File.write(filepath, data, mode: "w")
+        pipeline.destinations.each do |dest|
+          exporter = fetch_exporter(dest)
 
-        puts "CSV file for #{pipeline.name} output to: #{filepath}"
-
-        files[pipeline.name] = { path: filepath }
+          exporter.export(pipeline.name, filename, data)
+        end
       end
-
-      files
     end
-
     private_class_method :new
 
   private
 
-    attr_reader :report, :csv_builder
+    def fetch_exporter(name)
+      exporter = @exporters[name]
+      raise "No exporter found for destination: #{name}" unless exporter
 
-    def output_path(recipient)
-      "#{output_directory}/#{report.filename_prefix}-#{recipient}.csv"
-    end
-
-    def output_directory
-      ENV.fetch(
-        "OUTPUT_DIR",
-        File.expand_path("../../output", __dir__),
-      )
-    end
-
-    def relative_to_cwd(path)
-      Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd))
+      exporter
     end
   end
 end

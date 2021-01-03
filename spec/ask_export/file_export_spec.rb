@@ -1,49 +1,51 @@
 RSpec.describe AskExport::FileExport do
   describe ".call" do
-    around do |example|
-      travel_to(Time.zone.parse("2020-05-01 10:00")) { example.run }
-    end
-
-    around do |example|
-      expect { example.run }.to output.to_stdout
-    end
-
     before do
-      allow(AskExport::Report).to receive(:new).and_return(stubbed_report)
-      allow(AskExport::CsvBuilder).to receive(:new).and_return(csv_builder)
+      allow(AskExport::Exporters).to receive(:load_all).and_return(exporters)
       allow(AskExport::Pipeline).to receive(:load_all).and_return(pipelines)
-      allow(File).to receive(:write)
+
+      report_builder = instance_double("AskExport::ReportBuilder")
+      allow(AskExport::ReportBuilder).to receive(:new).and_return(report_builder)
+
+      allow(report_builder).to receive(:build).with(only_completed: true).and_return(
+        instance_double("AskExport::Report", filename: "file-a.csv", to_csv: "completed-data"),
+      )
+      allow(report_builder).to receive(:build).with(only_completed: false).and_return(
+        instance_double("AskExport::Report", filename: "file-b.csv", to_csv: "all-data"),
+      )
     end
 
-    let(:csv_builder) do
-      instance_double(AskExport::CsvBuilder, build_csv: "csv-data")
+    let(:exporters) do
+      {
+        "exporter_a" => spy("ExporterA"),
+        "exporter_b" => spy("ExporterB"),
+      }
     end
 
     let(:pipelines) do
       [
-        instance_double(AskExport::Pipeline, name: "cabinet-office", fields: %i[a b], only_completed: true),
-        instance_double(AskExport::Pipeline, name: "data-labs", fields: %i[a b], only_completed: true),
+        instance_double(
+          AskExport::Pipeline,
+          name: "pipeline-a",
+          fields: %i[a b],
+          only_completed: true,
+          destinations: %w[exporter_a],
+        ),
+        instance_double(
+          AskExport::Pipeline,
+          name: "pipeline-b",
+          fields: %i[x y],
+          only_completed: false,
+          destinations: %w[exporter_b],
+        ),
       ]
     end
 
-    it "writes files for each partner named with current date" do
-      files = described_class.call
+    it "calls export on all the exporters defined in the pipelines" do
+      described_class.call
 
-      expected_files = {
-        "cabinet-office" => {
-          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-cabinet-office.csv",
-        },
-        "data-labs" => {
-          path: "../../output/2020-04-30-1000-to-2020-05-01-1000-data-labs.csv",
-        },
-      }
-
-      expected_files.each do |_name, file|
-        file[:path] = File.expand_path(file[:path], __dir__)
-        expect(File).to have_received(:write).with(file[:path], "csv-data", mode: "w")
-      end
-
-      expect(files).to eq(expected_files)
+      expect(exporters["exporter_a"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+      expect(exporters["exporter_b"]).to have_received(:export).with("pipeline-b", "file-b.csv", "all-data")
     end
   end
 end

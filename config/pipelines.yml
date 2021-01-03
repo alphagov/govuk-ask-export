@@ -1,6 +1,9 @@
 ---
 pipelines:
   cabinet-office:
+    destinations:
+      - local_filesystem
+      - google_drive
     only_completed: true
     fields:
       - id
@@ -11,6 +14,9 @@ pipelines:
       - phone
       - question_format
   data-labs:
+    destinations:
+      - local_filesystem
+      - google_drive
     only_completed: true
     fields:
       - submission_time
@@ -20,6 +26,9 @@ pipelines:
       - hashed_email
       - hashed_phone
   performance-analyst:
+    destinations:
+      - local_filesystem
+      - google_drive
     only_completed: false
     fields:
       - start_time
@@ -29,6 +38,9 @@ pipelines:
       - client_id
       - region
   third-party:
+    destinations:
+      - local_filesystem
+      - google_drive
     only_completed: true
     fields:
       - id
