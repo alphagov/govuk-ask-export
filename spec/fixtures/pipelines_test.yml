@@ -1,0 +1,12 @@
+---
+pipelines:
+  a:
+    only_completed: false
+    fields:
+      - b
+      - c
+  x:
+    only_completed: true
+    fields:
+      - y
+      - z

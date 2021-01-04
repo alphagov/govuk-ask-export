@@ -1,0 +1,50 @@
+---
+pipelines:
+  cabinet-office:
+    destinations:
+      - local_filesystem
+      - google_drive
+    only_completed: true
+    fields:
+      - id
+      - submission_time
+      - region
+      - name
+      - email
+      - phone
+      - question_format
+  data-labs:
+    destinations:
+      - local_filesystem
+      - google_drive
+    only_completed: true
+    fields:
+      - submission_time
+      - region
+      - question
+      - question_format
+      - hashed_email
+      - hashed_phone
+  performance-analyst:
+    destinations:
+      - local_filesystem
+      - google_drive
+    only_completed: false
+    fields:
+      - start_time
+      - submission_time
+      - status
+      - user_agent
+      - client_id
+      - region
+  third-party:
+    destinations:
+      - local_filesystem
+      - google_drive
+    only_completed: true
+    fields:
+      - id
+      - submission_time
+      - region
+      - question
+      - question_format

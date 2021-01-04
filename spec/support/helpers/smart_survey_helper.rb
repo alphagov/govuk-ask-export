@@ -65,6 +65,20 @@ module SmartSurveyHelper
     }
   end
 
+  def report_response(options = {}, secret_key = "")
+    response = serialised_survey_response(options)
+
+    status = options.fetch(:status, "completed")
+    completed = status == "completed"
+
+    response.merge({
+      start_time: "01/05/2020 08:55:00",
+      submission_time: "01/05/2020 09:00:00",
+      hashed_email: completed ? Digest::SHA256.hexdigest("jane@example.com" + secret_key) : nil,
+      hashed_phone: completed ? Digest::SHA256.hexdigest("+447123456789" + secret_key) : nil,
+    }.compact)
+  end
+
   def stubbed_report(responses: [serialised_survey_response])
     report = AskExport::Report.new
     allow(report).to receive(:responses).and_return(responses)

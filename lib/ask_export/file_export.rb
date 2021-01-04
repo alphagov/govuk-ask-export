@@ -5,44 +5,36 @@ module AskExport
     end
 
     def initialize
-      @report = Report.new
-      @csv_builder = CsvBuilder.new(report)
+      config_path = File.expand_path("../../config/pipelines.yml", __dir__)
+
+      @pipelines = Pipeline.load_all(config_path)
+      @exporters = Exporters.load_all
+      @report_builder = ReportBuilder.new
     end
 
     def call
-      files = {
-        "cabinet-office" => { data: csv_builder.cabinet_office, path: output_path("cabinet-office") },
-        "data-labs" => { data: csv_builder.data_labs, path: output_path("data-labs") },
-        "performance-analyst" => { data: csv_builder.performance_analyst, path: output_path("performance-analyst") },
-        "third-party" => { data: csv_builder.third_party, path: output_path("third-party") },
-      }
+      @pipelines.each do |pipeline|
+        report = @report_builder.build(only_completed: pipeline.only_completed)
 
-      files.each { |_, file| File.write(file[:path], file[:data], mode: "w") }
-      relative_paths = files.values.map { |file| relative_to_cwd(file[:path]) }
+        filename = report.filename(pipeline.name, "csv")
+        data = report.to_csv(pipeline.fields)
 
-      puts "CSV files have been output to: #{relative_paths.join(', ')}"
-      files
+        pipeline.destinations.each do |dest|
+          exporter = fetch_exporter(dest)
+
+          exporter.export(pipeline.name, filename, data)
+        end
+      end
     end
-
     private_class_method :new
 
   private
 
-    attr_reader :report, :csv_builder
+    def fetch_exporter(name)
+      exporter = @exporters[name]
+      raise "No exporter found for destination: #{name}" unless exporter
 
-    def output_path(recipient)
-      "#{output_directory}/#{report.filename_prefix}-#{recipient}.csv"
-    end
-
-    def output_directory
-      ENV.fetch(
-        "OUTPUT_DIR",
-        File.expand_path("../../output", __dir__),
-      )
-    end
-
-    def relative_to_cwd(path)
-      Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd))
+      exporter
     end
   end
 end

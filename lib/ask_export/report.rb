@@ -1,35 +1,28 @@
+require "csv"
+
 module AskExport
   class Report
-    def since_time
-      @since_time ||= parse_time(ENV.fetch("SINCE_TIME", "10:00"),
-                                 relative_to: Date.yesterday)
+    def initialize(responses, start_time, end_time)
+      @responses = responses
+      @start_time = start_time
+      @end_time = end_time
     end
 
-    def until_time
-      @until_time ||= parse_time(ENV.fetch("UNTIL_TIME", "10:00"),
-                                 relative_to: Date.current)
-    end
-
-    def responses
-      @responses ||= SurveyResponseFetcher.call(since_time, until_time)
-    end
-
-    def completed_responses
-      responses.select { |r| r[:status] == "completed" }
-    end
-
-    def filename_prefix
-      time_format = "%Y-%m-%d-%H%M"
-      "#{since_time.strftime(time_format)}-to-#{until_time.strftime(time_format)}"
-    end
-
-  private
-
-    def parse_time(time, relative_to:)
-      Time.zone.parse(time, relative_to).tap do |parsed|
-        message = %("#{time}" could not be parsed as a time)
-        raise ArgumentError, message unless parsed
+    def to_csv(fields)
+      CSV.generate do |csv|
+        csv << fields
+        @responses.each do |response|
+          csv << fields.map { |field| response[field] }
+        end
       end
+    end
+
+    def filename(recipient, ext)
+      time_format = "%Y-%m-%d-%H%M"
+      start_time = @start_time.strftime(time_format)
+      end_time = @end_time.strftime(time_format)
+
+      "#{start_time}-to-#{end_time}-#{recipient}.#{ext}"
     end
   end
 end
