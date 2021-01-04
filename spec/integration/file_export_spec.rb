@@ -8,6 +8,7 @@ RSpec.describe "File export" do
   let!(:smart_survey_request) { stub_smart_survey_api }
 
   it "fetches surveys and creates files for them" do
+    stub_aws_s3_client
     stub_drive_authentication
     recipients = %w[cabinet-office data-labs performance-analyst third-party]
 
