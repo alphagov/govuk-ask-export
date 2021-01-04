@@ -10,6 +10,22 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.0)
+    aws-eventstream (1.1.0)
+    aws-partitions (1.414.0)
+    aws-sdk-core (3.110.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+      aws-partitions (~> 1, >= 1.239.0)
+      aws-sigv4 (~> 1.1)
+      jmespath (~> 1.0)
+    aws-sdk-kms (1.40.0)
+      aws-sdk-core (~> 3, >= 3.109.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.87.0)
+      aws-sdk-core (~> 3, >= 3.109.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.2.2)
+      aws-eventstream (~> 1, >= 1.0.2)
     climate_control (0.2.0)
     concurrent-ruby (1.1.6)
     crack (0.4.3)
@@ -40,6 +56,7 @@ GEM
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.4)
+    jmespath (1.4.0)
     jwt (2.2.2)
     memoist (0.16.2)
     mini_mime (1.0.2)
@@ -117,6 +134,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  aws-sdk-s3 (~> 1)
   climate_control
   faraday
   google-api-client
