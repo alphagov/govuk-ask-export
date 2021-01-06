@@ -24,10 +24,19 @@ module AskExport
       email_field_id: 11289069,
       phone_field_id: 11312922,
     },
+    live_version_2: {
+      survey_id: 845945,
+      region_field_id: 12808286,
+      question_field_id: 12808290,
+      question_format_field_id: 12808730,
+      name_field_id: 12808285,
+      email_field_id: 12808288,
+      phone_field_id: 12808287,
+    },
   }.freeze
 
   def self.config(item)
-    environment = ENV["SMART_SURVEY_LIVE"] == "true" ? :live : :draft
+    environment = ENV.fetch("SMART_SURVEY_CONFIG", "draft").to_sym
     CONFIG[environment].fetch(item)
   end
 end
