@@ -73,7 +73,7 @@ RSpec.describe AskExport::SurveyResponseFetcher do
 
       it "can use the live environment" do
         live_request = stub_smart_survey_api(environment: :live)
-        ClimateControl.modify(SMART_SURVEY_LIVE: "true") do
+        ClimateControl.modify(SMART_SURVEY_CONFIG: "live") do
           described_class.call(since_time, until_time)
         end
         expect(live_request).to have_been_made

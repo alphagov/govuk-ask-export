@@ -62,7 +62,7 @@ bundle exec rake file_export
 
 The following environment variables should be configured for the task:
 
-- `SMART_SURVEY_LIVE` (optional) - set this to `"true"` to access the live survey,
+- `SMART_SURVEY_CONFIG` (optional) - set this to `"live"` to access the live survey,
   otherwise the draft one will be used.
 - `SMART_SURVEY_API_TOKEN` - accessible via Smart Survey in Account > API Keys
 - `SMART_SURVEY_API_TOKEN_SECRET`
@@ -80,7 +80,7 @@ The following environment variables should be configured for the task:
 Example:
 
 ```
-SMART_SURVEY_LIVE=true SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
 ```
 
 ## Licence
