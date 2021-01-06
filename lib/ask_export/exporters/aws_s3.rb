@@ -12,6 +12,7 @@ module AskExport
         bucket_name = AwsS3.bucket_name_from_env(pipeline_name)
 
         @client.put_object({
+          acl: "bucket-owner-full-control",
           body: file,
           bucket: bucket_name,
           key: filename,
