@@ -8,11 +8,16 @@ RSpec.describe "File export" do
   let!(:smart_survey_request) { stub_smart_survey_api }
 
   it "fetches surveys and creates files for them" do
-    stub_aws_s3_client
+    s3_client = stub_aws_s3_client
     stub_drive_authentication
-    recipients = %w[cabinet-office data-labs performance-analyst third-party]
 
-    file_upload_stubs = recipients.map do |recipient|
+    expected_exports = {
+      local_filesystem: %w[cabinet-office data-labs performance-analyst third-party gcs-public-questions],
+      google_drive: %w[cabinet-office third-party],
+      aws_s3: %w[gcs-public-questions],
+    }
+
+    google_drive_stubs = expected_exports[:google_drive].map do |recipient|
       filename = "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv"
       stub_google_drive_upload(filename, "#{recipient}-folder-id")
     end
@@ -27,16 +32,33 @@ RSpec.describe "File export" do
                             FOLDER_ID_CABINET_OFFICE: "cabinet-office-folder-id",
                             FOLDER_ID_DATA_LABS: "data-labs-folder-id",
                             FOLDER_ID_THIRD_PARTY: "third-party-folder-id",
-                            FOLDER_ID_PERFORMANCE_ANALYST: "performance-analyst-folder-id") do
+                            FOLDER_ID_PERFORMANCE_ANALYST: "performance-analyst-folder-id",
+                            S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS: "bucket-name") do
         Rake::Task["file_export"].invoke
       end
 
       expect(smart_survey_request).to have_been_made
-      recipients.each do |recipient|
+
+      expected_exports[:local_filesystem].each do |recipient|
         expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv"))
       end
 
-      file_upload_stubs.each { |stub| expect(stub).to have_been_requested }
+      google_drive_stubs.each { |stub| expect(stub).to have_been_requested }
+
+      expect(s3_client.api_requests.size).to eq(expected_exports[:aws_s3].count)
+
+      aws_requests = s3_client.api_requests.map { |r| r[:params] }
+
+      expected_aws_requests = expected_exports[:aws_s3].map do |recipient|
+        include(
+          body: be_a(StringIO),
+          bucket: "bucket-name",
+          key: "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv",
+          server_side_encryption: "AES256",
+        )
+      end
+
+      expect(aws_requests).to include(*expected_aws_requests)
     end
   end
 end

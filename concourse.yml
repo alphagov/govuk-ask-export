@@ -88,9 +88,10 @@ jobs:
             FOLDER_ID_DATA_LABS: ((google-drive-folder-id-data-labs))
             FOLDER_ID_PERFORMANCE_ANALYST: ((google-drive-folder-id-performance-analyst))
             FOLDER_ID_THIRD_PARTY: ((google-drive-folder-id-third-party))
-            AWS_REGION: eu-west-1
+            AWS_REGION: eu-west-2
             AWS_ACCESS_KEY_ID: ((aws-access-key-id))
             AWS_SECRET_ACCESS_KEY: ((aws-secret-access-key))
+            S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS: ((aws-s3-bucket-name-gcs-public-questions))
         on_success:
           put: gds-slack
           params:
