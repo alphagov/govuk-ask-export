@@ -20,6 +20,8 @@ module AskExport
                                    upload_source: file,
                                    supports_all_drives: true,
                                    content_type: "text/csv")
+
+        puts "Google Drive Exporter: #{filename} uploaded to https://drive.google.com/drive/folders/#{folder_id}"
       end
 
       def self.folder_id_from_env(name)
