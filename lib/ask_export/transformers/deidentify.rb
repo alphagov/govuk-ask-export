@@ -87,6 +87,8 @@ module AskExport
       end
 
       def bulk_transform(values)
+        puts "Deidentify Tranform: removing identifing information from #{values.count} values"
+
         # Split values in to groups of 500 as maximum per request
         values.each_slice(500).flat_map do |values_slice|
           # Create request with multiple values prevent doing individual
