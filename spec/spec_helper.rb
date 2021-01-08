@@ -11,6 +11,7 @@ Rake.application.load_rakefile
 RSpec.configure do |config|
   include ActiveSupport::Testing::TimeHelpers
   include AwsS3Helper
+  include GoogleCloudHelper
   include GoogleDriveHelper
   include SmartSurveyHelper
 

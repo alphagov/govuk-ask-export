@@ -8,6 +8,9 @@ RSpec.describe "File export" do
   let!(:smart_survey_request) { stub_smart_survey_api }
 
   it "fetches surveys and creates files for them" do
+    dlp_client = stub_dlp_client
+    expect_deidentify_to_called(dlp_client, ["A question?"] * 50, ["A question?"] * 50)
+
     s3_client = stub_aws_s3_client
     stub_drive_authentication
 
@@ -29,6 +32,7 @@ RSpec.describe "File export" do
                             SECRET_KEY: SecureRandom.uuid,
                             SINCE_TIME: "2020-05-06 20:00",
                             UNTIL_TIME: "2020-05-07 11:00",
+                            GOOGLE_CLOUD_PROJECT: "project-name",
                             FOLDER_ID_CABINET_OFFICE: "cabinet-office-folder-id",
                             FOLDER_ID_DATA_LABS: "data-labs-folder-id",
                             FOLDER_ID_THIRD_PARTY: "third-party-folder-id",
