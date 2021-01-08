@@ -15,9 +15,9 @@ RSpec.describe "File export" do
     stub_drive_authentication
 
     expected_exports = {
-      local_filesystem: %w[cabinet-office data-labs performance-analyst third-party gcs-public-questions],
+      local_filesystem: [],
       google_drive: %w[cabinet-office third-party],
-      aws_s3: %w[gcs-public-questions],
+      aws_s3: [],
     }
 
     google_drive_stubs = expected_exports[:google_drive].map do |recipient|
