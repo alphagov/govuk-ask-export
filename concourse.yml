@@ -84,6 +84,7 @@ jobs:
             GOOGLE_CLIENT_ID: ((google-client-id))
             GOOGLE_CLIENT_EMAIL: ((google-client-email))
             GOOGLE_PRIVATE_KEY: ((google-private-key))
+            GOOGLE_CLOUD_PROJECT: ((google-cloud-project))
             FOLDER_ID_CABINET_OFFICE: ((google-drive-folder-id-cabinet-office))
             FOLDER_ID_DATA_LABS: ((google-drive-folder-id-data-labs))
             FOLDER_ID_PERFORMANCE_ANALYST: ((google-drive-folder-id-performance-analyst))
