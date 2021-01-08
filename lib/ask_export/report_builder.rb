@@ -14,9 +14,9 @@ module AskExport
 
     def responses
       @responses ||= begin
-        SurveyResponseFetcher.call(since_time, until_time).map do |response|
-          add_computed_fields(response)
-        end
+        raw_responses = SurveyResponseFetcher.call(since_time, until_time)
+
+        post_process(raw_responses)
       end
     end
 
@@ -31,6 +31,24 @@ module AskExport
     end
 
   private
+
+    def post_process(raw_responses)
+      # Add extra fields to each response
+      raw_responses = raw_responses.map do |response|
+        add_computed_fields(response)
+      end
+
+      # Pull out all the questions to remove PII
+      questions = raw_responses.map { |r| r[:question] }
+      deidentified_questions = Transformers::Deidentify.new.bulk_transform(questions)
+
+      # Replace question with deidentified version
+      raw_responses.each.with_index do |response, index|
+        response[:question] = deidentified_questions[index]
+      end
+
+      raw_responses
+    end
 
     def add_computed_fields(response)
       computed_fields = {}

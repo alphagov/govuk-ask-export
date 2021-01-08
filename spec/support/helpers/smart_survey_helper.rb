@@ -72,6 +72,7 @@ module SmartSurveyHelper
     completed = status == "completed"
 
     response.merge({
+      question: options[:question],
       start_time: "01/05/2020 08:55:00",
       submission_time: "01/05/2020 09:00:00",
       hashed_email: completed ? Digest::SHA256.hexdigest("jane@example.com" + secret_key) : nil,

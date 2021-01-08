@@ -49,12 +49,14 @@ RSpec.describe AskExport::ReportBuilder do
     it "delegates to SurveyResponseFetcher" do
       instance = described_class.new
       responses = [serialised_survey_response({ id: 1 })]
-      expected_responses = [report_response({ id: 1 }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
 
       expect(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .with(instance.since_time, instance.until_time)
         .and_return(responses)
+
+      stub_deidentify(1)
 
       ClimateControl.modify(SECRET_KEY: secret_key) do
         expect(instance.responses).to eq(expected_responses)
@@ -70,11 +72,13 @@ RSpec.describe AskExport::ReportBuilder do
         serialised_survey_response(status: "disqualified"),
       ]
 
-      expected_responses = [report_response({ id: 1 }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
 
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .and_return(responses)
+
+      stub_deidentify(3)
 
       ClimateControl.modify(SECRET_KEY: secret_key) do
         expect(described_class.new.completed_responses).to eq(expected_responses)
@@ -94,10 +98,12 @@ RSpec.describe AskExport::ReportBuilder do
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .and_return(responses)
+
+      stub_deidentify(2)
     end
 
     it "returns a report with only completed responses" do
-      expected_responses = [report_response({ id: 1 }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
 
       expect(AskExport::Report).to receive(:new)
         .with(
@@ -113,8 +119,8 @@ RSpec.describe AskExport::ReportBuilder do
 
     it "returns a report with all responses" do
       expected_responses = [
-        report_response({ id: 1 }, secret_key),
-        report_response({ status: "partial", id: 2 }, secret_key),
+        report_response({ id: 1, question: "REDACTED1" }, secret_key),
+        report_response({ status: "partial", id: 2, question: "REDACTED2" }, secret_key),
       ]
 
       expect(AskExport::Report).to receive(:new)
@@ -128,5 +134,16 @@ RSpec.describe AskExport::ReportBuilder do
         described_class.new.build(false)
       end
     end
+  end
+
+  def stub_deidentify(number_of_values)
+    transformer = instance_double("AskExport::Transformers::Deidentify")
+    allow(AskExport::Transformers::Deidentify)
+      .to receive(:new)
+      .and_return(transformer)
+
+    return_values = Array.new(number_of_values) { |i| "REDACTED#{i + 1}" }
+
+    allow(transformer).to receive(:bulk_transform).and_return(return_values)
   end
 end
