@@ -6,7 +6,6 @@ pipelines:
     only_completed: true
     fields:
       - id
-      - submission_time
       - region
       - name
       - email
@@ -18,12 +17,12 @@ pipelines:
     only_completed: true
     fields:
       - id
-      - submission_time
       - region
       - question
       - question_format
   gcs-public-questions:
-    destinations: []
+    destinations:
+      - aws_s3
     only_completed: true
     fields:
       - submission_time
