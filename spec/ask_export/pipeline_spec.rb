@@ -36,4 +36,40 @@ RSpec.describe AskExport::Pipeline do
       expect(pipeline.targets).to eq(%w[a b c])
     end
   end
+
+  describe "#run" do
+    let(:targets) do
+      {
+        "target_a" => spy("TargetA"),
+        "target_b" => spy("TargetB"),
+      }
+    end
+
+    before do
+      allow(AskExport::Targets).to receive(:load_all).and_return(targets)
+
+      @report_builder = instance_double("AskExport::ReportBuilder")
+
+      allow(@report_builder).to receive(:build).with(only_completed: true).and_return(
+        instance_double("AskExport::Report", filename: "file-a.csv", to_csv: "completed-data"),
+      )
+      allow(@report_builder).to receive(:build).with(only_completed: false).and_return(
+        instance_double("AskExport::Report", filename: "file-b.csv", to_csv: "all-data"),
+      )
+    end
+
+    it "calls the correct export target" do
+      pipeline = AskExport::Pipeline.new(
+        name: "pipeline-a",
+        fields: %i[a b],
+        only_completed: true,
+        targets: %w[target_a target_b],
+      )
+
+      pipeline.run(@report_builder)
+
+      expect(targets["target_a"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+      expect(targets["target_b"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+    end
+  end
 end

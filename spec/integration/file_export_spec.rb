@@ -36,7 +36,7 @@ RSpec.describe "File export" do
                             FOLDER_ID_CABINET_OFFICE: "cabinet-office-folder-id",
                             FOLDER_ID_THIRD_PARTY: "third-party-folder-id",
                             S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS: "bucket-name") do
-        Rake::Task["file_export"].invoke
+        Rake::Task["run_exports"].invoke
       end
 
       expect(smart_survey_request).to have_been_made

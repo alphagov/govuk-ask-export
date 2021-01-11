@@ -57,7 +57,7 @@ CSV files intended for different audiences. These are:
 The task can be run with:
 
 ```
-bundle exec rake file_export
+bundle exec rake run_exports
 ```
 
 The following environment variables should be configured for the task:
@@ -80,7 +80,7 @@ The following environment variables should be configured for the task:
 Example:
 
 ```
-SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake file_export
+SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake run_exports
 ```
 
 ## Licence

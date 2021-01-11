@@ -70,7 +70,7 @@ jobs:
               - |
                 set -e
                 bundle install --deployment
-                bundle exec rake file_export
+                bundle exec rake run_exports
           params:
             SECRET_KEY: ((secret-key))
             SINCE_TIME: 00:00
