@@ -57,20 +57,12 @@ module SmartSurveyHelper
       start_time: Time.zone.parse("2020-05-01 08:55:00+01Z"),
       end_time: Time.zone.parse("2020-05-01 09:00:00+01Z"),
       region: completed ? options.fetch(:region, "Greater London") : nil,
-      question: completed ? "A question?" : nil,
+      question: completed ? options.fetch(:question, "A question?") : nil,
       share_video: completed ? "Yes" : nil,
       name: completed ? "Jane Doe" : nil,
       email: completed ? "jane@example.com" : nil,
       phone: completed ? "+447123456789" : nil,
     }
-  end
-
-  def report_response(options = {})
-    response = serialised_survey_response(options)
-
-    response.merge({
-      question: options[:question],
-    }.compact)
   end
 
   def stubbed_report(responses: [serialised_survey_response])

@@ -46,8 +46,8 @@ RSpec.describe AskExport::ReportBuilder do
   describe "#responses" do
     it "delegates to SurveyResponseFetcher" do
       instance = described_class.new
-      responses = [serialised_survey_response({ id: 1 })]
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
+      responses = [serialised_survey_response(id: 1)]
+      expected_responses = [serialised_survey_response(id: 1, question: "REDACTED1")]
 
       expect(AskExport::SurveyResponseFetcher)
         .to receive(:call)
@@ -68,7 +68,7 @@ RSpec.describe AskExport::ReportBuilder do
         serialised_survey_response(status: "disqualified"),
       ]
 
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
+      expected_responses = [serialised_survey_response(id: 1, question: "REDACTED1")]
 
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
@@ -92,12 +92,11 @@ RSpec.describe AskExport::ReportBuilder do
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
         .and_return(responses)
-
-      stub_deidentify(2)
     end
 
     it "returns a report with only completed responses" do
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
+      expected_responses = [serialised_survey_response(id: 1, question: "REDACTED1")]
+      stub_deidentify(2)
 
       expect(AskExport::Report).to receive(:new)
         .with(
@@ -111,9 +110,10 @@ RSpec.describe AskExport::ReportBuilder do
 
     it "returns a report with all responses" do
       expected_responses = [
-        report_response({ id: 1, question: "REDACTED1" }),
-        report_response({ status: "partial", id: 2, question: "REDACTED2" }),
+        serialised_survey_response(id: 1, question: "REDACTED1"),
+        serialised_survey_response(status: "partial", id: 2),
       ]
+      stub_deidentify(1)
 
       expect(AskExport::Report).to receive(:new)
         .with(

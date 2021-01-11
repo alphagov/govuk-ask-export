@@ -1,9 +1,9 @@
 RSpec.describe AskExport::Report do
   let(:responses) do
     [
-      report_response(id: 1, region: "Scotland"),
-      report_response(id: 2, status: "partial"),
-      report_response(id: 3, status: "disqualified"),
+      serialised_survey_response(id: 1, region: "Scotland"),
+      serialised_survey_response(id: 2, status: "partial"),
+      serialised_survey_response(id: 3, status: "disqualified"),
     ]
   end
 
