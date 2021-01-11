@@ -7,13 +7,17 @@ module AskExport
 
     INFO_TYPES = %w[
       DATE_OF_BIRTH
+      CREDIT_CARD_NUMBER
       EMAIL_ADDRESS
       PASSPORT
       PERSON_NAME
       PHONE_NUMBER
       STREET_ADDRESS
+      SCOTLAND_COMMUNITY_HEALTH_INDEX_NUMBER
+      UK_DRIVERS_LICENSE_NUMBER
       UK_NATIONAL_INSURANCE_NUMBER
       UK_NATIONAL_HEALTH_SERVICE_NUMBER
+      UK_TAXPAYER_REFERENCE
     ].freeze
 
     INSPECTION_CONFIG = {
@@ -104,8 +108,15 @@ module AskExport
 
         # Retrieve values from response. This assumes the order of values in
         # the array in the request is the same as the response
-        response.item.table.rows.map { |row| row.values[0].string_value }
+        response.item.table.rows.map { |row| regex_removal(row.values[0].string_value) }
       end
+    end
+
+    def regex_removal(text)
+      text = text.gsub(/(?i)nhs\s?(?:.{0,20})?(?:\d\D?){9}(?:\d)/, "NHS_NUMBER")
+      text = text.gsub(/(?i)\b(?:[a-z]\W?){2}(?:\d\W?){6}\W?[a-z]\b/, "NI_NUMBER")
+      text = text.gsub(/(?:\d\D?){16}/, "CREDIT_CARD_NUMBER")
+      text
     end
   end
 end
