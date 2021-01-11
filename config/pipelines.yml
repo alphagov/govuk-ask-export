@@ -1,7 +1,7 @@
 ---
 pipelines:
   cabinet-office:
-    destinations:
+    targets:
       - google_drive
     only_completed: true
     fields:
@@ -12,7 +12,7 @@ pipelines:
       - phone
       - share_video
   third-party:
-    destinations:
+    targets:
       - google_drive
     only_completed: true
     fields:
@@ -21,7 +21,7 @@ pipelines:
       - question
       - share_video
   gcs-public-questions:
-    destinations:
+    targets:
       - aws_s3
     only_completed: true
     fields:

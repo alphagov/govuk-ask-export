@@ -29,14 +29,14 @@ RSpec.describe AskExport::FileExport do
           name: "pipeline-a",
           fields: %i[a b],
           only_completed: true,
-          destinations: %w[target_a],
+          targets: %w[target_a],
         ),
         instance_double(
           AskExport::Pipeline,
           name: "pipeline-b",
           fields: %i[x y],
           only_completed: false,
-          destinations: %w[target_b],
+          targets: %w[target_b],
         ),
       ]
     end

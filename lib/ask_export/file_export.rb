@@ -19,8 +19,8 @@ module AskExport
         filename = report.filename(pipeline.name, "csv")
         data = report.to_csv(pipeline.fields)
 
-        pipeline.destinations.each do |dest|
-          target = fetch_target(dest)
+        pipeline.targets.each do |target_name|
+          target = fetch_target(target_name)
 
           target.export(pipeline.name, filename, data)
         end
