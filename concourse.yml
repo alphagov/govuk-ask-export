@@ -1,4 +1,11 @@
 ---
+slack_settings: &slack_settings
+  channel: '#govuk-smart-answers-devs'
+  username: GOV.UK Ask Export
+  icon_emoji: ':concourse:'
+  silent: true
+  always_notify: true
+
 resource_types:
   - name: slack-notification
     type: docker-image
@@ -42,15 +49,6 @@ jobs:
       - get: export-schedule
         trigger: true
       - get: govuk-ask-export
-      - put: gds-slack
-        params: &live_slack_notification
-          channel: '#govuk-smart-answers-devs'
-          username: GOV.UK Ask Export
-          icon_emoji: ':concourse:'
-          silent: true
-          always_notify: true
-          text: >
-            :alarm_clock: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Daily export> of questions from Survey Monkey to Google Drive started
       - task: file-export
         config:
           image_resource:
@@ -96,18 +94,18 @@ jobs:
         on_success:
           put: gds-slack
           params:
-            <<: *live_slack_notification
+            <<: *slack_settings
             text: >
               :white_check_mark: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Export successful>
         on_failure:
           put: gds-slack
           params:
-            <<: *live_slack_notification
+            <<: *slack_settings
             text: >
-              :x: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Export failed>. <!here>
+              :x: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Export failed> <!here>
         on_error:
           put: gds-slack
           params:
-            <<: *live_slack_notification
+            <<: *slack_settings
             text: >
-              :warning: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Error with export>. <!here>
+              :warning: <https://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|Error occured with export> <!here>
