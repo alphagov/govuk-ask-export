@@ -15,5 +15,27 @@ module AskExport
       @only_completed = only_completed
       @targets = targets
     end
+
+    def run(report_builder)
+      report = report_builder.build(only_completed: only_completed)
+
+      filename = report.filename(name, "csv")
+      data = report.to_csv(fields)
+
+      targets.each do |target_name|
+        target = fetch_target(target_name)
+
+        target.export(name, filename, data)
+      end
+    end
+
+  private
+
+    def fetch_target(name)
+      target = Targets.load_all[name]
+      raise "Export target #{name} not found" unless target
+
+      target
+    end
   end
 end
