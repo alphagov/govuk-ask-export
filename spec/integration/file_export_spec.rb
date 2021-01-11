@@ -29,7 +29,6 @@ RSpec.describe "File export" do
       ClimateControl.modify(SMART_SURVEY_API_TOKEN: "token",
                             SMART_SURVEY_API_TOKEN_SECRET: "token",
                             OUTPUT_DIR: tmpdir,
-                            SECRET_KEY: SecureRandom.uuid,
                             SINCE_TIME: "2020-05-06 20:00",
                             UNTIL_TIME: "2020-05-07 11:00",
                             GOOGLE_CLOUD_PROJECT: "project-name",
