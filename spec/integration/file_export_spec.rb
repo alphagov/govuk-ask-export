@@ -17,7 +17,7 @@ RSpec.describe "File export" do
     expected_exports = {
       local_filesystem: [],
       google_drive: %w[cabinet-office third-party],
-      aws_s3: [],
+      aws_s3: %w[gcs-public-questions],
     }
 
     google_drive_stubs = expected_exports[:google_drive].map do |recipient|
@@ -34,9 +34,7 @@ RSpec.describe "File export" do
                             UNTIL_TIME: "2020-05-07 11:00",
                             GOOGLE_CLOUD_PROJECT: "project-name",
                             FOLDER_ID_CABINET_OFFICE: "cabinet-office-folder-id",
-                            FOLDER_ID_DATA_LABS: "data-labs-folder-id",
                             FOLDER_ID_THIRD_PARTY: "third-party-folder-id",
-                            FOLDER_ID_PERFORMANCE_ANALYST: "performance-analyst-folder-id",
                             S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS: "bucket-name") do
         Rake::Task["file_export"].invoke
       end
