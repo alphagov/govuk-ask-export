@@ -137,13 +137,13 @@ RSpec.describe AskExport::ReportBuilder do
   end
 
   def stub_deidentify(number_of_values)
-    transformer = instance_double("AskExport::Transformers::Deidentify")
-    allow(AskExport::Transformers::Deidentify)
+    deidentifier = instance_double("AskExport::Deidentifier")
+    allow(AskExport::Deidentifier)
       .to receive(:new)
-      .and_return(transformer)
+      .and_return(deidentifier)
 
     return_values = Array.new(number_of_values) { |i| "REDACTED#{i + 1}" }
 
-    allow(transformer).to receive(:bulk_transform).and_return(return_values)
+    allow(deidentifier).to receive(:bulk_deidentify).and_return(return_values)
   end
 end

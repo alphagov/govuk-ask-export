@@ -1,6 +1,6 @@
 module AskExport
   class Pipeline
-    attr_reader :name, :fields, :only_completed, :destinations
+    attr_reader :name, :fields, :only_completed, :targets
 
     def self.load_all(config_path)
       pipelines = YAML.load_file(config_path).fetch("pipelines")
@@ -9,11 +9,11 @@ module AskExport
       end
     end
 
-    def initialize(name:, fields: [], only_completed: true, destinations: [])
+    def initialize(name:, fields: [], only_completed: true, targets: [])
       @name = name
       @fields = fields.map(&:to_sym)
       @only_completed = only_completed
-      @destinations = destinations
+      @targets = targets
     end
   end
 end

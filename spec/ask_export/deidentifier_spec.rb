@@ -1,16 +1,16 @@
-RSpec.describe AskExport::Transformers::Deidentify do
-  describe "#bulk_transform" do
+RSpec.describe AskExport::Deidentifier do
+  describe "#bulk_deidentify" do
     it "makes calls to Google Cloud DLP" do
       client = stub_dlp_client
 
       expect_deidentify_to_called(client, %w[a b c d], %w[a x x d])
 
       ClimateControl.modify GOOGLE_CLOUD_PROJECT: "project-name" do
-        transformer = described_class.new
+        deidentifier = described_class.new
 
-        transformed_values = transformer.bulk_transform(%w[a b c d])
+        deidentified_values = deidentifier.bulk_deidentify(%w[a b c d])
 
-        expect(transformed_values).to eq(%w[a x x d])
+        expect(deidentified_values).to eq(%w[a x x d])
       end
     end
 
@@ -25,11 +25,11 @@ RSpec.describe AskExport::Transformers::Deidentify do
       expect_deidentify_to_called(client, %w[c] * 200, %w[c] * 200)
 
       ClimateControl.modify GOOGLE_CLOUD_PROJECT: "project-name" do
-        transformer = described_class.new
+        deidentifier = described_class.new
 
-        transformed_values = transformer.bulk_transform(original_values)
+        deidentified_values = deidentifier.bulk_deidentify(original_values)
 
-        expect(transformed_values).to eq(expected_values)
+        expect(deidentified_values).to eq(expected_values)
       end
     end
   end

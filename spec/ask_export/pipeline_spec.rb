@@ -15,7 +15,7 @@ RSpec.describe AskExport::Pipeline do
       expect(pipeline.name).to eq("pipeline1")
       expect(pipeline.fields).to eq([])
       expect(pipeline.only_completed).to be(true)
-      expect(pipeline.destinations).to eq([])
+      expect(pipeline.targets).to eq([])
     end
 
     it "returns object with fields as symbols" do
@@ -30,10 +30,10 @@ RSpec.describe AskExport::Pipeline do
       expect(pipeline.only_completed).to be(false)
     end
 
-    it "returns object with destinations" do
-      pipeline = AskExport::Pipeline.new(name: "pipeline1", destinations: %w[a b c])
+    it "returns object with targets" do
+      pipeline = AskExport::Pipeline.new(name: "pipeline1", targets: %w[a b c])
 
-      expect(pipeline.destinations).to eq(%w[a b c])
+      expect(pipeline.targets).to eq(%w[a b c])
     end
   end
 end

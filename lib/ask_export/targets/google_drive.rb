@@ -2,7 +2,7 @@ require "google/apis/drive_v3"
 require "googleauth"
 
 module AskExport
-  module Exporters
+  module Targets
     class GoogleDrive
       SCOPE = Google::Apis::DriveV3::AUTH_DRIVE
 
@@ -21,7 +21,7 @@ module AskExport
                                    supports_all_drives: true,
                                    content_type: "text/csv")
 
-        puts "Google Drive Exporter: #{filename} uploaded to https://drive.google.com/drive/folders/#{folder_id}"
+        puts "Google Drive export: #{filename} uploaded to https://drive.google.com/drive/folders/#{folder_id}"
       end
 
       def self.folder_id_from_env(name)

@@ -1,12 +1,12 @@
 module AskExport
-  module Exporters
-    class LocalFilesystem
+  module Targets
+    class Filesystem
       def export(_pipeline_name, filename, data)
-        filepath = "#{LocalFilesystem.output_directory}/#{filename}"
+        filepath = "#{Filesystem.output_directory}/#{filename}"
 
         File.write(filepath, data, mode: "w")
 
-        puts "File Exporter: file saved to #{filepath}"
+        puts "File export: file saved to #{filepath}"
       end
 
       def self.output_directory

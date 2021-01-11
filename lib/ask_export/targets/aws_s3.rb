@@ -1,7 +1,7 @@
 require "aws-sdk-s3"
 
 module AskExport
-  module Exporters
+  module Targets
     class AwsS3
       def initialize
         @client = Aws::S3::Client.new
@@ -19,7 +19,7 @@ module AskExport
           server_side_encryption: "AES256",
         })
 
-        puts "AWS S3 Exporter: #{filename} uploaded to s3://#{bucket_name}"
+        puts "AWS S3 export: #{filename} uploaded to s3://#{bucket_name}"
       end
 
       def self.bucket_name_from_env(name)
