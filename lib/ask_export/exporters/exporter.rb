@@ -4,7 +4,7 @@ module AskExport
       {
         "aws_s3" => AwsS3.new,
         "google_drive" => GoogleDrive.new,
-        "local_filesystem" => LocalFilesystem.new,
+        "filesystem" => Filesystem.new,
       }
     end
   end

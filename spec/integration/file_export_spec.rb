@@ -15,7 +15,7 @@ RSpec.describe "File export" do
     stub_drive_authentication
 
     expected_exports = {
-      local_filesystem: [],
+      filesystem: [],
       google_drive: %w[cabinet-office third-party],
       aws_s3: %w[gcs-public-questions],
     }
@@ -41,7 +41,7 @@ RSpec.describe "File export" do
 
       expect(smart_survey_request).to have_been_made
 
-      expected_exports[:local_filesystem].each do |recipient|
+      expected_exports[:filesystem].each do |recipient|
         expect(File).to exist(File.join(tmpdir, "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv"))
       end
 
