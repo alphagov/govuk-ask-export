@@ -1,11 +1,11 @@
-RSpec.describe AskExport::Exporters::AwsS3 do
+RSpec.describe AskExport::Targets::AwsS3 do
   describe "#export" do
     it "makes a put object call to AWS S3" do
       stubbed_client = stub_aws_s3_client
 
-      exporter = AskExport::Exporters::AwsS3.new
+      target = AskExport::Targets::AwsS3.new
       ClimateControl.modify S3_BUCKET_NAME_PIPELINE_NAME: "bucket-name" do
-        exporter.export("pipeline-name", "file.csv", "data")
+        target.export("pipeline-name", "file.csv", "data")
       end
 
       expect(stubbed_client.api_requests.size).to eq(1)
@@ -21,7 +21,7 @@ RSpec.describe AskExport::Exporters::AwsS3 do
   describe "#bucket_name_from_env" do
     it "returns an bucket name" do
       ClimateControl.modify S3_BUCKET_NAME_SOME_NAME: "bucket-name" do
-        bucket_name = AskExport::Exporters::AwsS3.bucket_name_from_env("some-name")
+        bucket_name = AskExport::Targets::AwsS3.bucket_name_from_env("some-name")
         expect(bucket_name).to eq("bucket-name")
       end
     end

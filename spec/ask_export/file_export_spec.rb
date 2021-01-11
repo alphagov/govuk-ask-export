@@ -1,7 +1,7 @@
 RSpec.describe AskExport::FileExport do
   describe ".call" do
     before do
-      allow(AskExport::Exporters).to receive(:load_all).and_return(exporters)
+      allow(AskExport::Targets).to receive(:load_all).and_return(targets)
       allow(AskExport::Pipeline).to receive(:load_all).and_return(pipelines)
 
       report_builder = instance_double("AskExport::ReportBuilder")
@@ -15,10 +15,10 @@ RSpec.describe AskExport::FileExport do
       )
     end
 
-    let(:exporters) do
+    let(:targets) do
       {
-        "exporter_a" => spy("ExporterA"),
-        "exporter_b" => spy("ExporterB"),
+        "target_a" => spy("TargetA"),
+        "target_b" => spy("TargetB"),
       }
     end
 
@@ -29,23 +29,23 @@ RSpec.describe AskExport::FileExport do
           name: "pipeline-a",
           fields: %i[a b],
           only_completed: true,
-          destinations: %w[exporter_a],
+          destinations: %w[target_a],
         ),
         instance_double(
           AskExport::Pipeline,
           name: "pipeline-b",
           fields: %i[x y],
           only_completed: false,
-          destinations: %w[exporter_b],
+          destinations: %w[target_b],
         ),
       ]
     end
 
-    it "calls export on all the exporters defined in the pipelines" do
+    it "calls export on all the targets defined in the pipelines" do
       described_class.call
 
-      expect(exporters["exporter_a"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
-      expect(exporters["exporter_b"]).to have_received(:export).with("pipeline-b", "file-b.csv", "all-data")
+      expect(targets["target_a"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+      expect(targets["target_b"]).to have_received(:export).with("pipeline-b", "file-b.csv", "all-data")
     end
   end
 end

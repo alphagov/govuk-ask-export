@@ -8,7 +8,7 @@ module AskExport
       config_path = File.expand_path("../../config/pipelines.yml", __dir__)
 
       @pipelines = Pipeline.load_all(config_path)
-      @exporters = Exporters.load_all
+      @targets = Targets.load_all
       @report_builder = ReportBuilder.new
     end
 
@@ -20,9 +20,9 @@ module AskExport
         data = report.to_csv(pipeline.fields)
 
         pipeline.destinations.each do |dest|
-          exporter = fetch_exporter(dest)
+          target = fetch_target(dest)
 
-          exporter.export(pipeline.name, filename, data)
+          target.export(pipeline.name, filename, data)
         end
       end
     end
@@ -30,11 +30,11 @@ module AskExport
 
   private
 
-    def fetch_exporter(name)
-      exporter = @exporters[name]
-      raise "No exporter found for destination: #{name}" unless exporter
+    def fetch_target(name)
+      target = @targets[name]
+      raise "Export target #{name} not found" unless target
 
-      exporter
+      target
     end
   end
 end

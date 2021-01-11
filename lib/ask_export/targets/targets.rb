@@ -1,5 +1,5 @@
 module AskExport
-  module Exporters
+  module Targets
     def self.load_all
       {
         "aws_s3" => AwsS3.new,
