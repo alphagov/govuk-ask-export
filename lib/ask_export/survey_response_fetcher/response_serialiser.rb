@@ -38,7 +38,7 @@ module AskExport
       # We've had situations where an incomplete survey response is returned
       # from Smart Survey with a "completed" status this seems to because
       # Smart Survey enforces required fields only on the client side
-      required = %i[region question question_format name email phone]
+      required = %i[region question share_video name email phone]
       nil_fields = required.select { |field| answers[field].nil? }
 
       if nil_fields.any?
@@ -55,7 +55,7 @@ module AskExport
       @answers ||= {
         region: fetch_choice_answer(:region_field_id),
         question: fetch_value_answer(:question_field_id),
-        question_format: fetch_choice_answer(:question_format_field_id),
+        share_video: fetch_choice_answer(:share_video_field_id),
         name: fetch_value_answer(:name_field_id),
         email: fetch_value_answer(:email_field_id),
         phone: fetch_value_answer(:phone_field_id),
