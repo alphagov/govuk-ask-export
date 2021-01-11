@@ -25,6 +25,6 @@ pipelines:
       - aws_s3
     only_completed: true
     fields:
-      - submission_time
+      - end_time
       - region
       - question

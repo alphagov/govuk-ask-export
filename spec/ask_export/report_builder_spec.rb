@@ -1,6 +1,4 @@
 RSpec.describe AskExport::ReportBuilder do
-  let(:secret_key) { "secret" }
-
   around do |example|
     travel_to(Time.zone.parse("2020-05-01 12:00")) { example.run }
   end
@@ -49,7 +47,7 @@ RSpec.describe AskExport::ReportBuilder do
     it "delegates to SurveyResponseFetcher" do
       instance = described_class.new
       responses = [serialised_survey_response({ id: 1 })]
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
 
       expect(AskExport::SurveyResponseFetcher)
         .to receive(:call)
@@ -58,9 +56,7 @@ RSpec.describe AskExport::ReportBuilder do
 
       stub_deidentify(1)
 
-      ClimateControl.modify(SECRET_KEY: secret_key) do
-        expect(instance.responses).to eq(expected_responses)
-      end
+      expect(instance.responses).to eq(expected_responses)
     end
   end
 
@@ -72,7 +68,7 @@ RSpec.describe AskExport::ReportBuilder do
         serialised_survey_response(status: "disqualified"),
       ]
 
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
 
       allow(AskExport::SurveyResponseFetcher)
         .to receive(:call)
@@ -80,9 +76,7 @@ RSpec.describe AskExport::ReportBuilder do
 
       stub_deidentify(3)
 
-      ClimateControl.modify(SECRET_KEY: secret_key) do
-        expect(described_class.new.completed_responses).to eq(expected_responses)
-      end
+      expect(described_class.new.completed_responses).to eq(expected_responses)
     end
   end
 
@@ -103,7 +97,7 @@ RSpec.describe AskExport::ReportBuilder do
     end
 
     it "returns a report with only completed responses" do
-      expected_responses = [report_response({ id: 1, question: "REDACTED1" }, secret_key)]
+      expected_responses = [report_response({ id: 1, question: "REDACTED1" })]
 
       expect(AskExport::Report).to receive(:new)
         .with(
@@ -112,15 +106,13 @@ RSpec.describe AskExport::ReportBuilder do
           Time.zone.parse("2020-05-01 10:00"),
         )
 
-      ClimateControl.modify(SECRET_KEY: secret_key) do
-        described_class.new.build(true)
-      end
+      described_class.new.build(true)
     end
 
     it "returns a report with all responses" do
       expected_responses = [
-        report_response({ id: 1, question: "REDACTED1" }, secret_key),
-        report_response({ status: "partial", id: 2, question: "REDACTED2" }, secret_key),
+        report_response({ id: 1, question: "REDACTED1" }),
+        report_response({ status: "partial", id: 2, question: "REDACTED2" }),
       ]
 
       expect(AskExport::Report).to receive(:new)
@@ -130,9 +122,7 @@ RSpec.describe AskExport::ReportBuilder do
           Time.zone.parse("2020-05-01 10:00"),
         )
 
-      ClimateControl.modify(SECRET_KEY: secret_key) do
-        described_class.new.build(false)
-      end
+      described_class.new.build(false)
     end
   end
 

@@ -72,7 +72,6 @@ jobs:
                 bundle install --deployment
                 bundle exec rake run_exports
           params:
-            SECRET_KEY: ((secret-key))
             SINCE_TIME: 00:00
             UNTIL_TIME: 00:00
             SMART_SURVEY_API_TOKEN: ((smart-survey-api-token))

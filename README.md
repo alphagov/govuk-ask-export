@@ -66,8 +66,6 @@ The following environment variables should be configured for the task:
   otherwise the draft one will be used.
 - `SMART_SURVEY_API_TOKEN` - accessible via Smart Survey in Account > API Keys
 - `SMART_SURVEY_API_TOKEN_SECRET`
-- `SECRET_KEY` - a key that is used as salt to hashing functions to anonymise
-  personally identifiable information
 - `SINCE_TIME` - defaults to "10:00", can be changed to alter the time
   exports include data from. When this is a relative time (for example "10:00") it
   will be for the previous day, otherwise an absolute time can be set (for example
@@ -80,7 +78,7 @@ The following environment variables should be configured for the task:
 Example:
 
 ```
-SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SECRET_KEY=$(openssl rand -hex 64) SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake run_exports
+SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake run_exports
 ```
 
 ## Licence
