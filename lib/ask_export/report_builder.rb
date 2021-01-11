@@ -40,7 +40,7 @@ module AskExport
 
       # Pull out all the questions to remove PII
       questions = raw_responses.map { |r| r[:question] }
-      deidentified_questions = Transformers::Deidentify.new.bulk_transform(questions)
+      deidentified_questions = Deidentifier.new.bulk_deidentify(questions)
 
       # Replace question with deidentified version
       raw_responses.each.with_index do |response, index|
