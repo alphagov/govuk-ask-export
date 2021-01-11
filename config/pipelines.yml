@@ -10,7 +10,7 @@ pipelines:
       - name
       - email
       - phone
-      - question_format
+      - share_video
   third-party:
     destinations:
       - google_drive
@@ -19,7 +19,7 @@ pipelines:
       - id
       - region
       - question
-      - question_format
+      - share_video
   gcs-public-questions:
     destinations:
       - aws_s3
