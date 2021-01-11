@@ -8,7 +8,7 @@ RSpec::Core::RakeTask.new
 task default: %w[rubocop spec]
 
 desc "Export questions from Smart Survey"
-task :file_export do
+task :run_exports do
   config_path = File.expand_path("config/pipelines.yml", __dir__)
 
   pipelines = AskExport::Pipeline.load_all(config_path)
