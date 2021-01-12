@@ -1,23 +1,29 @@
 # GOV.UK Ask Export
 
-A tool for working with the data of the Smart Survey that powers
-https://www.gov.uk/ask. This downloads data from Smart Survey and splits
-this data into CSV files. These can then be distributed manually with
-recipients.
+A tool for exporting the user responses and metadata from Smart Survey which is
+used for the https://www.gov.uk/ask service. This does the following:
 
-This was once a [bigger project][remove-pr] which ran an automated daily task
-using Concourse. This process automatically distributed files to Google Drive,
-notified users via GOV.UK Notify and populated a database in Google Big Query.
-This was retired when the UK Governments daily coronavirus press conferences
-ended.
+- downloads data from Smart Survey API
+- removes identifying strings from the user's question text
+- formats the data in CSV file
+- exports the CSV file to specified targets including to the local filesystem,
+  a Google Drive folder or an AWS S3 bucket
 
-[remove-pr]: https://github.com/alphagov/govuk-ask-export/pull/17
+A concourse pipeline has been configured to run daily, to export the previous
+day's smart survey data. However, this project can also be run manually on your
+local machine if needed.
 
 ## Dependencies
 
-To use all the functionality in this project you will need access to the
-GOV.UK [Smart Survey](https://www.smartsurvey.co.uk/) account. The
-credentials are available in [govuk-secrets][].
+This project has several external dependencies and needs access to the
+following credentials:
+
+- GOV.UK's [Smart Survey](https://www.smartsurvey.co.uk/) account. The
+  credentials are available in [govuk-secrets][].
+- Google Cloud Platform Service Account with appropiate permissions, DLP and
+  Google Drive APIs enabled and billing enabled. This is used to remove
+  identifiable strings and to export files to Google Drive
+- AWS IAM User credentials to export files to an S3 bucket.
 
 [govuk-secrets]: https://github.com/alphagov/govuk-secrets
 
@@ -27,6 +33,83 @@ credentials are available in [govuk-secrets][].
 
 Install dependencies with `bundle install`
 
+### Configure the exports
+
+The exports are configured in `config/pipelines.yml` (not to be confused with
+concourse pipelines). Each pipeline represents a version of the CSV data being
+generated. Pipeline configured to export specific data fields or CSV columns
+listed under `fields` attribute. Each pipeline can specify zero or more export
+targets under the `targets` attribute. These are the names of the locations to
+which the file should be exported to.
+
+### Set the environment variables
+
+The following environment variables should be configured:
+
+| Environment Variable Key       | Description                                                                                                                                                                                                                            |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SMART_SURVEY_CONFIG            | This configures which Smart Survey to retrieve data from. Defaults to `draft`. Set to `live_version_2` for the latest survey.                                                                                                          |
+| SMART_SURVEY_API_TOKEN         | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
+| SMART_SURVEY_API_TOKEN_SECRET  | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
+| SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") and will be for the previous day. Or can set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
+| UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") and will be for the current day. Or can set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "10:00".                        |
+| AWS_REGION                     | The AWS Region where the export S3 buckets are located. Currently does not support multiple buckets in different regions.                                                                                                              |
+| AWS_ACCESS_KEY_ID              | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
+| AWS_SECRET_ACCESS_KEY          | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
+| S3_BUCKET_NAME_<PIPELINE_NAME> | Each pipeline with an export target `aws_s3` requires an environment variable to be set. This specifies the name of the AWS S3 bucket to export to for that pipeline. E.g. `cabinet-office` needs `S3_BUCKET_NAME_CABINET_OFFICE` set. |
+| FOLDER_ID_<PIPELINE_NAME>      | Each pipeline with an export target `google_drive` requires an environment variable to be set. This specifies the Google Drive folder to export to for that pipeline. E.g. `cabinet-office` needs `FOLDER_ID_CABINET_OFFICE` set.      |
+| GOOGLE_CLOUD_PROJECT           | The GCP project name which has the billing and DLP API enabled.                                                                                                                                                                        |
+| GOOGLE_ACCOUNT_TYPE            | The account type for the credentials used by Google APIs. This should be `service_account`.                                                                                                                                            |
+| GOOGLE_CLIENT_ID               | GCP credentials for the service account.                                                                                                                                                                                               |
+| GOOGLE_CLIENT_EMAIL            | GCP credentials for the service account.                                                                                                                                                                                               |
+| GOOGLE_PRIVATE_KEY             | GCP credentials for the service account.                                                                                                                                                                                               |
+
+Then run the rake task:
+
+```
+bundle exec rake run_exports
+```
+
+To run existing pipeline:
+
+```
+SINCE_TIME=00:00 \
+UNTIL_TIME=00:00 \
+SMART_SURVEY_API_TOKEN=<smart-survey-api-token> \
+SMART_SURVEY_API_TOKEN_SECRET=<smart-survey-api-token-secret> \
+SMART_SURVEY_CONFIG=live_version_2 \
+GOOGLE_ACCOUNT_TYPE=service_account \
+GOOGLE_CLIENT_ID=<google-client-id> \
+GOOGLE_CLIENT_EMAIL=<google-client-email> \
+GOOGLE_PRIVATE_KEY=<google-private-key> \
+GOOGLE_CLOUD_PROJECT=<google-cloud-project> \
+FOLDER_ID_CABINET_OFFICE=<google-drive-folder-id-cabinet-office> \
+FOLDER_ID_THIRD_PARTY=<google-drive-folder-id-third-party> \
+AWS_REGION=<aws-region> \
+AWS_ACCESS_KEY_ID=<aws-access-key-id> \
+AWS_SECRET_ACCESS_KEY=<aws-secret-access-key> \
+S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS=<aws-s3-bucket-name-gcs-public-questions> \
+bundle exec rake run_exports
+```
+
+Mininal configration to run would be:
+
+```
+SINCE_TIME=09:00 \
+UNTIL_TIME=11:00\
+SMART_SURVEY_CONFIG=live_version_2 \
+SMART_SURVEY_API_TOKEN=<api-token> \
+SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> \
+GOOGLE_CLOUD_PROJECT=<project-name> \
+GOOGLE_ACCOUNT_TYPE=service_account \
+GOOGLE_CLIENT_ID=<client-id> \
+GOOGLE_CLIENT_EMAIL=<service-account-email> \
+GOOGLE_PRIVATE_KEY=<private-key> \
+bundle exec rake run_exports
+```
+
+## Development
+
 ### Run tests
 
 ```
@@ -34,52 +117,6 @@ bundle exec rake
 ```
 
 This will lint and test the code.
-
-### Run a file export
-
-Running a file export downloads data from Smart Survey and outputs 4 different
-CSV files intended for different audiences. These are:
-
-- Third party polling organisation - they receive question ids and the
-  questions themselves, without any personal information. It is intended to be
-  used for determining which questions are used in conferences.
-- Cabinet Office - they receive question ids and personal information of
-  question submitters, they do not receive questions. It is used to provide
-  necessary contact information to contact question submitters.
-- Data Labs - they receive questions submitted and hashed versions of email
-  addresses and phone numbers to help detect duplicate. Data Labs are expected
-  to run the questions through a personally identifiable information removal
-  tool before analysis
-- Performance Analyst - they receive data on the access to the service and
-  completion rates, which can be used to determine success rates and user
-  journeys.
-
-The task can be run with:
-
-```
-bundle exec rake run_exports
-```
-
-The following environment variables should be configured for the task:
-
-- `SMART_SURVEY_CONFIG` (optional) - set this to `"live"` to access the live survey,
-  otherwise the draft one will be used.
-- `SMART_SURVEY_API_TOKEN` - accessible via Smart Survey in Account > API Keys
-- `SMART_SURVEY_API_TOKEN_SECRET`
-- `SINCE_TIME` - defaults to "10:00", can be changed to alter the time
-  exports include data from. When this is a relative time (for example "10:00") it
-  will be for the previous day, otherwise an absolute time can be set (for example
-  "2020-05-01 10:00") for a precise data export
-- `UNTIL_TIME` - defaults to "10:00", can be changed to alter the time
-  exports include data until. When this is a relative time (for example "10:00") it
-  will be for the current day, otherwise an absolute time can be set (for example
-  "2020-05-01 10:00") for a precise data export
-
-Example:
-
-```
-SMART_SURVEY_CONFIG=live SINCE_TIME=09:00 UNTIL_TIME=11:00 SMART_SURVEY_API_TOKEN=<api-token> SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> bundle exec rake run_exports
-```
 
 ## Licence
 
