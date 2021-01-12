@@ -20,7 +20,7 @@ following credentials:
 
 - GOV.UK's [Smart Survey](https://www.smartsurvey.co.uk/) account. The
   credentials are available in [govuk-secrets][].
-- Google Cloud Platform Service Account with appropiate permissions, DLP and
+- Google Cloud Platform Service Account with appropriate permissions, DLP and
   Google Drive APIs enabled and billing enabled. This is used to remove
   identifiable strings and to export files to Google Drive
 - AWS IAM User credentials to export files to an S3 bucket.
@@ -35,12 +35,13 @@ Install dependencies with `bundle install`
 
 ### Configure the exports
 
-The exports are configured in `config/pipelines.yml` (not to be confused with
-concourse pipelines). Each pipeline represents a version of the CSV data being
-generated. Pipeline configured to export specific data fields or CSV columns
-listed under `fields` attribute. Each pipeline can specify zero or more export
-targets under the `targets` attribute. These are the names of the locations to
-which the file should be exported to.
+The exports are configured in
+[`config/pipelines.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines.yml)
+(not to be confused with concourse pipelines). Each pipeline represents a
+version of the CSV data being generated. Pipeline configured to export specific
+data fields or CSV columns listed under `fields` attribute. Each pipeline can
+specify zero or more export targets under the `targets` attribute. These are
+the names of the locations to which the file should be exported to.
 
 ### Set the environment variables
 
@@ -51,8 +52,8 @@ The following environment variables should be configured:
 | SMART_SURVEY_CONFIG            | This configures which Smart Survey to retrieve data from. Defaults to `draft`. Set to `live_version_2` for the latest survey.                                                                                                          |
 | SMART_SURVEY_API_TOKEN         | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
 | SMART_SURVEY_API_TOKEN_SECRET  | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
-| SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") and will be for the previous day. Or can set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
-| UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") and will be for the current day. Or can set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "10:00".                        |
+| SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") for the previous day or can be set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
+| UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") for the current day or can be set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "10:00".                        |
 | AWS_REGION                     | The AWS Region where the export S3 buckets are located. Currently does not support multiple buckets in different regions.                                                                                                              |
 | AWS_ACCESS_KEY_ID              | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
 | AWS_SECRET_ACCESS_KEY          | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
@@ -92,7 +93,7 @@ S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS=<aws-s3-bucket-name-gcs-public-questions> \
 bundle exec rake run_exports
 ```
 
-Mininal configration to run would be:
+Minimal configuration to run would be:
 
 ```
 SINCE_TIME=09:00 \
