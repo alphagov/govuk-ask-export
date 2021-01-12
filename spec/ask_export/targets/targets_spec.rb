@@ -1,24 +1,39 @@
 RSpec.describe AskExport::Targets do
-  describe "#load_all" do
-    it "returns a hash containing all targets" do
-      expected_targets = {}
+  describe "#find" do
+    let(:target_a1) { double("target_al") }
+    let(:target_b1) { double("target_bl") }
 
-      AskExport::Targets.constants.each do |target|
-        dummy_target = double(target.to_s)
-        allow(AskExport::Targets.const_get(target)).to receive(:new)
-          .and_return(dummy_target)
+    before do
+      target_classes = {
+        "target_a" => double("TargetA"),
+        "target_b" => double("TargetB"),
+      }
 
-        underscored_name = target.to_s
-          .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-          .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-          .downcase
+      allow(target_classes["target_a"]).to receive(:new)
+        .and_return(target_a1, double("target_a2"))
 
-        expected_targets[underscored_name] = dummy_target
-      end
+      allow(target_classes["target_b"]).to receive(:new)
+        .and_return(target_b1, double("target_b2"))
 
-      targets = AskExport::Targets.load_all
+      stub_const("AskExport::Targets::ALL", target_classes)
+    end
 
-      expect(targets).to eq(expected_targets)
+    it "returns the named target object" do
+      target = AskExport::Targets.find("target_a")
+
+      expect(target).to eq(target_a1)
+    end
+
+    it "returns the same named target object on multiple calls" do
+      AskExport::Targets.find("target_b")
+      target = AskExport::Targets.find("target_b")
+
+      expect(target).to eq(target_b1)
+    end
+
+    it "raises a error if target not available" do
+      expect { AskExport::Targets.find("target_c") }
+        .to raise_error("Export target target_c not found")
     end
   end
 end

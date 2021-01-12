@@ -38,15 +38,12 @@ RSpec.describe AskExport::Pipeline do
   end
 
   describe "#run" do
-    let(:targets) do
-      {
-        "target_a" => spy("TargetA"),
-        "target_b" => spy("TargetB"),
-      }
-    end
+    let(:target_a) { spy("TargetA") }
+    let(:target_b) { spy("TargetB") }
 
     before do
-      allow(AskExport::Targets).to receive(:load_all).and_return(targets)
+      allow(AskExport::Targets).to receive(:find).with("target_a").and_return(target_a)
+      allow(AskExport::Targets).to receive(:find).with("target_b").and_return(target_b)
 
       @report_builder = instance_double("AskExport::ReportBuilder")
 
@@ -68,8 +65,8 @@ RSpec.describe AskExport::Pipeline do
 
       pipeline.run(@report_builder)
 
-      expect(targets["target_a"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
-      expect(targets["target_b"]).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+      expect(target_a).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
+      expect(target_b).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
     end
   end
 end
