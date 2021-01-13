@@ -23,19 +23,10 @@ module AskExport
       data = report.to_csv(fields)
 
       targets.each do |target_name|
-        target = fetch_target(target_name)
+        target = Targets.find(target_name)
 
         target.export(name, filename, data)
       end
-    end
-
-  private
-
-    def fetch_target(name)
-      target = Targets.load_all[name]
-      raise "Export target #{name} not found" unless target
-
-      target
     end
   end
 end
