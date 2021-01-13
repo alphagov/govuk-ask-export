@@ -6,7 +6,7 @@ RSpec.describe AskExport::SurveyResponseFetcher do
     end
 
     around do |example|
-      travel_to(Time.zone.parse("2020-05-01 10:00")) { example.run }
+      travel_to(Time.zone.parse("2020-05-01 00:00")) { example.run }
     end
 
     around do |example|
@@ -16,8 +16,8 @@ RSpec.describe AskExport::SurveyResponseFetcher do
       ) { example.run }
     end
 
-    let(:since_time) { Time.zone.parse("2020-04-30 10:00") }
-    let(:until_time) { Time.zone.parse("2020-05-01 10:00") }
+    let(:since_time) { Time.zone.parse("2020-04-30 00:00") }
+    let(:until_time) { Time.zone.parse("2020-05-01 00:00") }
 
     context "successful retrievals" do
       around do |example|

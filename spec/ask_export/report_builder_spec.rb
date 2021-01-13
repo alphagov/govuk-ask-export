@@ -4,9 +4,9 @@ RSpec.describe AskExport::ReportBuilder do
   end
 
   describe "#since_time" do
-    it "defaults to 10am on the previous day in the current time zone" do
+    it "defaults to 12am on the previous day in the current time zone" do
       expect(described_class.new.since_time)
-        .to eq(Time.zone.parse("2020-04-30 10:00"))
+        .to eq(Time.zone.parse("2020-04-30 00:00"))
     end
 
     it "can use the SINCE_TIME environment variable to specify the relative time on " \
@@ -31,9 +31,9 @@ RSpec.describe AskExport::ReportBuilder do
   end
 
   describe "#until_time" do
-    it "defaults to 10am on the current day in the current time zone" do
+    it "defaults to 12am on the current day in the current time zone" do
       expect(described_class.new.until_time)
-        .to eq(Time.zone.parse("2020-05-01 10:00"))
+        .to eq(Time.zone.parse("2020-05-01 00:00"))
     end
 
     it "can be overridden with the UNTIL_TIME environment variable" do
@@ -101,8 +101,8 @@ RSpec.describe AskExport::ReportBuilder do
       expect(AskExport::Report).to receive(:new)
         .with(
           expected_responses,
-          Time.zone.parse("2020-04-30 10:00"),
-          Time.zone.parse("2020-05-01 10:00"),
+          Time.zone.parse("2020-04-30 00:00"),
+          Time.zone.parse("2020-05-01 00:00"),
         )
 
       described_class.new.build(true)
@@ -118,8 +118,8 @@ RSpec.describe AskExport::ReportBuilder do
       expect(AskExport::Report).to receive(:new)
         .with(
           expected_responses,
-          Time.zone.parse("2020-04-30 10:00"),
-          Time.zone.parse("2020-05-01 10:00"),
+          Time.zone.parse("2020-04-30 00:00"),
+          Time.zone.parse("2020-05-01 00:00"),
         )
 
       described_class.new.build(false)

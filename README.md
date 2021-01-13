@@ -52,8 +52,8 @@ The following environment variables should be configured:
 | SMART_SURVEY_CONFIG            | This configures which Smart Survey to retrieve data from. Defaults to `draft`. Set to `live_version_2` for the latest survey.                                                                                                          |
 | SMART_SURVEY_API_TOKEN         | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
 | SMART_SURVEY_API_TOKEN_SECRET  | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
-| SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") for the previous day or can be set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
-| UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") for the current day or can be set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "10:00".                        |
+| SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") for the previous day or can be set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "00:00".                        |
+| UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") for the current day or can be set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "00:00".                        |
 | AWS_REGION                     | The AWS Region where the export S3 buckets are located. Currently does not support multiple buckets in different regions.                                                                                                              |
 | AWS_ACCESS_KEY_ID              | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
 | AWS_SECRET_ACCESS_KEY          | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
@@ -74,8 +74,6 @@ bundle exec rake run_exports
 To run existing pipeline:
 
 ```
-SINCE_TIME=00:00 \
-UNTIL_TIME=00:00 \
 SMART_SURVEY_API_TOKEN=<smart-survey-api-token> \
 SMART_SURVEY_API_TOKEN_SECRET=<smart-survey-api-token-secret> \
 SMART_SURVEY_CONFIG=live_version_2 \
@@ -96,8 +94,6 @@ bundle exec rake run_exports
 Minimal configuration to run would be:
 
 ```
-SINCE_TIME=09:00 \
-UNTIL_TIME=11:00\
 SMART_SURVEY_CONFIG=live_version_2 \
 SMART_SURVEY_API_TOKEN=<api-token> \
 SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> \

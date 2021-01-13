@@ -1,12 +1,12 @@
 module AskExport
   class ReportBuilder
     def since_time
-      @since_time ||= parse_time(ENV.fetch("SINCE_TIME", "10:00"),
+      @since_time ||= parse_time(ENV.fetch("SINCE_TIME", "00:00"),
                                  relative_to: Date.yesterday)
     end
 
     def until_time
-      @until_time ||= parse_time(ENV.fetch("UNTIL_TIME", "10:00"),
+      @until_time ||= parse_time(ENV.fetch("UNTIL_TIME", "00:00"),
                                  relative_to: Date.current)
     end
 
