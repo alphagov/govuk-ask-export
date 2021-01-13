@@ -3,7 +3,6 @@ pipelines:
   cabinet-office:
     targets:
       - google_drive
-    only_completed: true
     fields:
       - id
       - region
@@ -14,7 +13,6 @@ pipelines:
   third-party:
     targets:
       - google_drive
-    only_completed: true
     fields:
       - id
       - region
@@ -23,7 +21,6 @@ pipelines:
   gcs-public-questions:
     targets:
       - aws_s3
-    only_completed: true
     fields:
       - end_time
       - region
