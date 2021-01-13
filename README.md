@@ -93,6 +93,11 @@ bundle exec rake run_exports
 
 Minimal configuration to run would be:
 
+If you want to export the responses to your local filesystem, set the
+[`config/pipelines.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines.yml)
+to be same as
+[`config/pipelines-local.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines-local.yml).
+
 ```
 SMART_SURVEY_CONFIG=live_version_2 \
 SMART_SURVEY_API_TOKEN=<api-token> \

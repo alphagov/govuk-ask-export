@@ -1,0 +1,27 @@
+---
+pipelines:
+  cabinet-office:
+    targets:
+      - filesystem
+    fields:
+      - id
+      - region
+      - name
+      - email
+      - phone
+      - share_video
+  third-party:
+    targets:
+      - filesystem
+    fields:
+      - id
+      - region
+      - question
+      - share_video
+  gcs-public-questions:
+    targets:
+      - filesystem
+    fields:
+      - end_time
+      - region
+      - question
