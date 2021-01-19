@@ -49,7 +49,7 @@ The following environment variables should be configured:
 
 | Environment Variable Key       | Description                                                                                                                                                                                                                            |
 |--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SMART_SURVEY_CONFIG            | This configures which Smart Survey to retrieve data from. Defaults to `draft`. Set to `live_version_2` for the latest survey.                                                                                                          |
+| SMART_SURVEY_CONFIG            | This configures which Smart Survey to retrieve data from. Defaults to `draft`. Set to `live` for the live survey.                                                                                                          |
 | SMART_SURVEY_API_TOKEN         | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
 | SMART_SURVEY_API_TOKEN_SECRET  | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
 | SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") for the previous day or can be set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
@@ -78,7 +78,7 @@ SINCE_TIME=00:00 \
 UNTIL_TIME=00:00 \
 SMART_SURVEY_API_TOKEN=<smart-survey-api-token> \
 SMART_SURVEY_API_TOKEN_SECRET=<smart-survey-api-token-secret> \
-SMART_SURVEY_CONFIG=live_version_2 \
+SMART_SURVEY_CONFIG=live \
 GOOGLE_ACCOUNT_TYPE=service_account \
 GOOGLE_CLIENT_ID=<google-client-id> \
 GOOGLE_CLIENT_EMAIL=<google-client-email> \
@@ -98,7 +98,7 @@ Minimal configuration to run would be:
 ```
 SINCE_TIME=09:00 \
 UNTIL_TIME=11:00\
-SMART_SURVEY_CONFIG=live_version_2 \
+SMART_SURVEY_CONFIG=live \
 SMART_SURVEY_API_TOKEN=<api-token> \
 SMART_SURVEY_API_TOKEN_SECRET=<api-token-secret> \
 GOOGLE_CLOUD_PROJECT=<project-name> \
