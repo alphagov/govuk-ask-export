@@ -1,4 +1,35 @@
 module SmartSurveyHelper
+  def stub_get_responses(survey_id, number_of_responses, options = {})
+    url = "https://api.smartsurvey.io/v1/surveys/#{survey_id}/responses"
+
+    query = {
+      since: options[:since_time]&.to_i&.to_s,
+      until: options[:until_time]&.to_i&.to_s,
+    }.compact
+
+    max_page_size = options.fetch(:page_size, 100)
+    page = 1
+    requests = []
+
+    while number_of_responses >= 0
+      page_size = [max_page_size, number_of_responses].min
+
+      responses = smart_survey_response(page_size)
+      body = JSON.generate(responses)
+
+      requests << stub_request(:get, url)
+        .with(query: hash_including(query.merge({ page: page.to_s })))
+        .to_return(body: body, status: 200)
+
+      page += 1
+      number_of_responses -= page_size
+
+      break if page_size == 0
+    end
+
+    requests
+  end
+
   def stub_smart_survey_api(options = {})
     environment = options.fetch(:environment, :draft)
     config = AskExport::CONFIG[environment]
