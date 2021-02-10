@@ -33,6 +33,8 @@ GEM
     declarative (0.0.20)
     declarative-option (0.1.0)
     diff-lcs (1.3)
+    factory_bot (6.1.0)
+      activesupport (>= 5.0.0)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
     gapic-common (0.3.4)
@@ -156,6 +158,7 @@ DEPENDENCIES
   activesupport
   aws-sdk-s3 (~> 1)
   climate_control
+  factory_bot
   faraday
   google-api-client
   google-cloud-dlp-v2
