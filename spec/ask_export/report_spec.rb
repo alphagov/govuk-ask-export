@@ -1,22 +1,22 @@
 RSpec.describe AskExport::Report do
   let(:responses) do
     [
-      serialised_survey_response(id: 1, region: "Scotland"),
-      serialised_survey_response(id: 2, status: "partial"),
-      serialised_survey_response(id: 3, status: "disqualified"),
+      build(:ask_response, id: 1, region: "Scotland"),
+      build(:ask_response, id: 2, status: "partial", region: nil),
+      build(:ask_response, id: 3, status: "disqualified", region: nil),
     ]
   end
 
   describe "#to_csv" do
     it "returns the responses formatted as a CSV" do
       report = described_class.new(responses, nil, nil)
-      fields = %i[end_time status user_agent region]
+      fields = %i[end_time status region]
 
       expect(report.to_csv(fields)).to eq(
-        "end_time,status,user_agent,region\n" \
-        "2020-05-01 09:00:00 +0100,completed,NCSA Mosaic/3.0 (Windows 95),Scotland\n" \
-        "2020-05-01 09:00:00 +0100,partial,NCSA Mosaic/3.0 (Windows 95),\n" \
-        "2020-05-01 09:00:00 +0100,disqualified,NCSA Mosaic/3.0 (Windows 95),\n",
+        "end_time,status,region\n" \
+        "2020-05-01 09:00:00 +0100,completed,Scotland\n" \
+        "2020-05-01 09:00:00 +0100,partial,\n" \
+        "2020-05-01 09:00:00 +0100,disqualified,\n",
       )
     end
   end

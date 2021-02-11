@@ -12,7 +12,7 @@ module AskExport
       CSV.generate do |csv|
         csv << fields
         @responses.each do |response|
-          csv << fields.map { |field| response[field] }
+          csv << fields.map { |field| response.send(field) }
         end
       end
     end
