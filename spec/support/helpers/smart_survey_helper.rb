@@ -77,31 +77,6 @@ module SmartSurveyHelper
     row
   end
 
-  def serialised_survey_response(options = {})
-    status = options.fetch(:status, "completed")
-    completed = status == "completed"
-    {
-      id: options.fetch(:id, random_id),
-      client_id: options[:client_id],
-      user_agent: "NCSA Mosaic/3.0 (Windows 95)",
-      status: status,
-      start_time: Time.zone.parse("2020-05-01 08:55:00+01Z"),
-      end_time: Time.zone.parse("2020-05-01 09:00:00+01Z"),
-      region: completed ? options.fetch(:region, "Greater London") : nil,
-      question: completed ? options.fetch(:question, "A question?") : nil,
-      share_video: completed ? "Yes" : nil,
-      name: completed ? "Jane Doe" : nil,
-      email: completed ? "jane@example.com" : nil,
-      phone: completed ? "+447123456789" : nil,
-    }
-  end
-
-  def stubbed_report(responses: [serialised_survey_response])
-    report = AskExport::Report.new
-    allow(report).to receive(:responses).and_return(responses)
-    report
-  end
-
 private
 
   def smart_survey_age_check_page(options)
