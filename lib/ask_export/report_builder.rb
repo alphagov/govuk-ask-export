@@ -1,3 +1,5 @@
+require "smart_survey/client"
+
 module AskExport
   class ReportBuilder
     def since_time
@@ -12,14 +14,17 @@ module AskExport
 
     def responses
       @responses ||= begin
-        raw_responses = SurveyResponseFetcher.call(since_time, until_time)
+        survey_id = AskExport.config(:survey_id)
+        raw_responses = SmartSurvey::Client.new.list_responses(
+          survey_id, since_time, until_time, AskExport::Response
+        )
 
         post_process(raw_responses)
       end
     end
 
     def completed_responses
-      responses.select { |r| r[:status] == "completed" }
+      responses.select(&:completed?)
     end
 
     def build(only_completed)
@@ -32,12 +37,12 @@ module AskExport
 
     def post_process(raw_responses)
       # Pull out all the questions to remove PII
-      questions = raw_responses.map { |r| r[:question] }
+      questions = raw_responses.map(&:question)
       deidentified_questions = Deidentifier.new.bulk_deidentify(questions)
 
       # Replace question with deidentified version
       raw_responses.each.with_index do |response, index|
-        response[:question] = deidentified_questions[index]
+        response.question = deidentified_questions[index]
       end
 
       raw_responses
