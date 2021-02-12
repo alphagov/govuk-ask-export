@@ -16,14 +16,17 @@ RSpec.describe SmartSurvey::Client do
 
     it "make the requests with correct parameters" do
       requests = stub_get_responses(survey_id, 200, since_time: since_time, until_time: until_time)
-      client.list_responses(survey_id, since_time, until_time)
+
+      client.list_responses(
+        survey_id: survey_id, since_time: since_time, until_time: until_time,
+      )
 
       requests.each { |request| expect(request).to have_been_made }
     end
 
     it "returns an array of responses" do
       stub_get_responses(survey_id, 2)
-      responses = client.list_responses(survey_id, since_time, until_time)
+      responses = client.list_responses(survey_id: survey_id)
 
       expect(responses).to contain_exactly(
         an_instance_of(SmartSurvey::Response),
@@ -33,7 +36,7 @@ RSpec.describe SmartSurvey::Client do
 
     it "can retreive more responses than maximum page size of 100" do
       stub_get_responses(survey_id, 250)
-      responses = client.list_responses(survey_id, since_time, until_time)
+      responses = client.list_responses(survey_id: survey_id)
 
       expect(responses.count).to eq(250)
     end
@@ -41,7 +44,7 @@ RSpec.describe SmartSurvey::Client do
     it "sleeps between each request" do
       stub_get_responses(survey_id, 250)
       expect_any_instance_of(described_class).to receive(:sleep).twice
-      client.list_responses(survey_id, since_time, until_time)
+      client.list_responses(survey_id: survey_id)
     end
   end
 end

@@ -22,20 +22,25 @@ module SmartSurvey
       end
     end
 
-    def list_responses(survey_id, since_time, until_time, response_class = SmartSurvey::Response)
-      puts "Requesting responses from #{since_time} until #{until_time}"
+    def list_responses(survey_id:, response_class: SmartSurvey::Response, **options)
+      since_time = options[:since_time]
+      until_time = options[:until_time]
 
-      responses = paginated_get(
-        "surveys/#{survey_id}/responses",
+      msg = "Requesting responses"
+      msg += " from #{since_time}" if since_time
+      msg += " to #{until_time}" if until_time
+      puts msg
+
+      params = {
         page_size: PAGE_SIZE,
-        since: since_time.to_i,
-        until: until_time.to_i,
+        since: since_time&.to_i,
+        until: until_time&.to_i,
         sort_by: "date_ended,asc",
-        include_labels: true,
-        # include both partial and completed responses
-        completed: 2,
-      ).to_a.flatten
+        include_labels: options.fetch(:include_labels, true),
+        completed: options.fetch(:completed, 2),
+      }.compact
 
+      responses = paginated_get("surveys/#{survey_id}/responses", **params).to_a.flatten
       responses = responses.map { |response| response_class.parse(response) }
 
       completed = responses.count(&:completed?)

@@ -52,7 +52,10 @@ RSpec.describe AskExport::ReportBuilder do
 
       allow(SmartSurvey::Client).to receive(:new).and_return(client)
       allow(client).to receive(:list_responses)
-        .with(849_813, instance.since_time, instance.until_time, AskExport::Response)
+        .with(survey_id: 849_813,
+              response_class: AskExport::Response,
+              since_time: instance.since_time,
+              until_time: instance.until_time)
         .and_return(responses)
 
       stub_deidentify(1)
