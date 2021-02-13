@@ -1,5 +1,5 @@
 RSpec.describe SmartSurvey::Client do
-  describe "#list_response" do
+  describe "#list_responses" do
     before do
       allow_any_instance_of(described_class).to receive(:sleep)
       allow_any_instance_of(Faraday::Request::Retry).to receive(:sleep)
