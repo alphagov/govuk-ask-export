@@ -7,7 +7,8 @@ RSpec.describe "File export" do
 
   let!(:smart_survey_request) do
     survey_id = AskExport.config(:survey_id)
-    stub_get_responses(survey_id, 50).first
+    responses = ask_smart_survey_responses(50)
+    stub_get_responses(survey_id, responses).first
   end
 
   it "fetches surveys and creates files for them" do

@@ -16,7 +16,10 @@ RSpec.describe SmartSurvey::Client do
     let(:until_time) { Time.zone.parse("2020-05-01 10:00") }
 
     it "make the requests with correct parameters" do
-      requests = stub_get_responses(survey_id, 200, since_time: since_time, until_time: until_time)
+      responses = smart_survey_responses(200)
+      requests = stub_get_responses(
+        survey_id, responses, since_time: since_time, until_time: until_time
+      )
 
       client.list_responses(
         survey_id: survey_id, since_time: since_time, until_time: until_time,
@@ -26,7 +29,7 @@ RSpec.describe SmartSurvey::Client do
     end
 
     it "returns an array of responses" do
-      stub_get_responses(survey_id, 2)
+      stub_get_responses(survey_id, smart_survey_responses(2))
       responses = client.list_responses(survey_id: survey_id)
 
       expect(responses).to contain_exactly(
@@ -36,14 +39,15 @@ RSpec.describe SmartSurvey::Client do
     end
 
     it "can retreive more responses than maximum page size of 100" do
-      stub_get_responses(survey_id, 250)
+      stub_get_responses(survey_id, smart_survey_responses(250))
       responses = client.list_responses(survey_id: survey_id)
 
       expect(responses.count).to eq(250)
     end
 
     it "sleeps between each request" do
-      stub_get_responses(survey_id, 250)
+      stub_get_responses(survey_id, smart_survey_responses(250))
+
       expect_any_instance_of(described_class).to receive(:sleep).twice
       client.list_responses(survey_id: survey_id)
     end

@@ -1,30 +1,30 @@
 module SmartSurveyHelper
-  def stub_get_responses(survey_id, number_of_responses, options = {})
+  def stub_get_responses(survey_id, responses, options = {})
     url = "https://api.smartsurvey.io/v1/surveys/#{survey_id}/responses"
 
     query = {
       since: options[:since_time]&.to_i&.to_s,
       until: options[:until_time]&.to_i&.to_s,
+      completed: options[:completed],
     }.merge(auth_parameters).compact
 
     max_page_size = options.fetch(:page_size, 100)
     page = 1
     requests = []
 
-    while number_of_responses >= 0
-      page_size = [max_page_size, number_of_responses].min
+    while responses.count >= 0
+      page_size = [max_page_size, responses.count].min
 
-      responses = ask_smart_survey_responses(page_size)
-      body = JSON.generate(responses)
+      body = JSON.generate(responses[0..(page_size - 1)])
 
       requests << stub_request(:get, url)
         .with(query: hash_including(query.merge({ page: page.to_s })))
         .to_return(body: body, status: 200)
 
       page += 1
-      number_of_responses -= page_size
+      responses.shift(page_size)
 
-      break if page_size == 0
+      break if page_size < max_page_size
     end
 
     requests
@@ -49,6 +49,12 @@ module SmartSurveyHelper
       "api_token" => anything,
       "api_token_secret" => anything,
     }
+  end
+
+  def smart_survey_responses(count, options = {})
+    count.times.map do
+      hash(:response, **options)
+    end
   end
 
   def ask_smart_survey_responses(count, options = {})
