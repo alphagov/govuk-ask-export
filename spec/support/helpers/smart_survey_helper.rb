@@ -14,7 +14,7 @@ module SmartSurveyHelper
     while number_of_responses >= 0
       page_size = [max_page_size, number_of_responses].min
 
-      responses = smart_survey_response(page_size)
+      responses = ask_smart_survey_responses(page_size)
       body = JSON.generate(responses)
 
       requests << stub_request(:get, url)
@@ -30,112 +30,32 @@ module SmartSurveyHelper
     requests
   end
 
-  def stub_smart_survey_api(options = {})
-    environment = options.fetch(:environment, :draft)
-    config = AskExport::CONFIG[environment]
-    url = "https://api.smartsurvey.io/v1/surveys/#{config[:survey_id]}/responses"
-    query = {
-      since: options[:since_time]&.to_i&.to_s,
-      until: options[:until_time]&.to_i&.to_s,
-      page: options[:page]&.to_s,
-    }.compact
+  def ask_smart_survey_responses(count, options = {})
+    count.times.map do
+      params = {
+        id: options[:id],
+        date_started: options[:start_time],
+        date_ended: options[:end_time],
+        status: options[:status],
+      }.compact
 
-    responses = smart_survey_response(50, environment: environment)
-    body = options.fetch(:body, responses)
-
-    stub_request(:get, url)
-      .with(query: hash_including(query))
-      .to_return(body: JSON.generate(body), status: options.fetch(:status, 200))
-  end
-
-  def smart_survey_response(items, options = {})
-    items.times.map { smart_survey_row(options) }
-  end
-
-  def smart_survey_row(options = {})
-    environment = options.fetch(:environment, :draft)
-    config = AskExport::CONFIG[environment]
-
-    row = {
-      id: options.fetch(:id, random_id),
-      survey_id: config[:survey_id],
-      date_started: options.fetch(:start_time, Time.zone.now).utc.iso8601,
-      date_ended: options.fetch(:end_time, Time.zone.now).utc.iso8601,
-      status: options.fetch(:status, "completed"),
-      user_agent: options.fetch(:user_agent, "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)"),
-      pages: [smart_survey_age_check_page(options),
-              smart_survey_answers_page(options)].compact,
-    }
-
-    if options[:client_id]
-      row[:variables] = [{ id: random_id,
-                           name: "_ga",
-                           label: "clientID",
-                           value: options[:client_id] }]
+      hash(:response, **params, pages: [
+        hash(:page, questions: [
+          hash(:question, :radio),
+        ]),
+        hash(:page, questions: [
+          hash(:question, :text, id: AskExport.config(:name_field_id)),
+          hash(:question, :dropdown, id: AskExport.config(:region_field_id)),
+          hash(:question, :text, id: AskExport.config(:phone_field_id)),
+          hash(:question, :text, id: AskExport.config(:email_field_id)),
+        ]),
+        hash(:page, questions: [
+          hash(:question, :essay, id: AskExport.config(:question_field_id)),
+        ]),
+        hash(:page, questions: [
+          hash(:question, :radio, id: AskExport.config(:share_video_field_id)),
+        ]),
+      ])
     end
-
-    row
-  end
-
-private
-
-  def smart_survey_age_check_page(options)
-    choice = options[:status] == "disqualified" ? "No" : "Yes"
-
-    {
-      id: random_id,
-      questions: [
-        smart_survey_answer(random_id,
-                            "Are you 18 or over?",
-                            choice,
-                            :choice_title),
-      ],
-    }
-  end
-
-  def smart_survey_answers_page(options)
-    return if %w[partial disqualified].include?(options[:status])
-
-    environment = options.fetch(:environment, :draft)
-    config = AskExport::CONFIG[environment]
-    {
-      id: random_id,
-      questions: [
-        smart_survey_answer(config[:question_field_id],
-                            "What is your question?",
-                            options.fetch(:question, "A question?"),
-                            :value),
-        smart_survey_answer(config[:name_field_id],
-                            "What is your name?",
-                            options.fetch(:name, "John Smith"),
-                            :value),
-        smart_survey_answer(config[:region_field_id],
-                            "Where do you live?",
-                            options.fetch(:region, "Yorkshire"),
-                            :choice_title),
-        smart_survey_answer(config[:email_field_id],
-                            "What is your email address?",
-                            options.fetch(:email, "me@example.com"),
-                            :value),
-        smart_survey_answer(config[:phone_field_id],
-                            "What is your phone number?",
-                            options.fetch(:phone, "0789123456"),
-                            :value),
-        smart_survey_answer(config[:share_video_field_id],
-                            "Are you happy to record a video asking your question?",
-                            options.fetch(:share_video, "Yes"),
-                            :choice_title),
-      ].compact,
-    }
-  end
-
-  def smart_survey_answer(id, title, answer, type)
-    return unless answer
-
-    { id: id, title: title, answers: [{ type => answer }] }
-  end
-
-  def random_id
-    rand(0..100_000)
   end
 end
