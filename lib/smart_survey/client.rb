@@ -48,6 +48,10 @@ module SmartSurvey
       responses
     end
 
+    def delete_response(survey_id:, response_id:)
+      @conn.delete("surveys/#{survey_id}/responses/#{response_id}")
+    end
+
   private
 
     def api_token

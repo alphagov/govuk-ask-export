@@ -1,4 +1,7 @@
 RSpec.describe SmartSurvey::Client do
+  let(:survey_id) { "123456789" }
+  let(:client) { described_class.new }
+
   describe "#list_responses" do
     before do
       allow_any_instance_of(described_class).to receive(:sleep)
@@ -11,8 +14,6 @@ RSpec.describe SmartSurvey::Client do
 
     let(:since_time) { Time.zone.parse("2020-04-30 10:00") }
     let(:until_time) { Time.zone.parse("2020-05-01 10:00") }
-    let(:survey_id) { "123456789" }
-    let(:client) { described_class.new }
 
     it "make the requests with correct parameters" do
       requests = stub_get_responses(survey_id, 200, since_time: since_time, until_time: until_time)
@@ -45,6 +46,17 @@ RSpec.describe SmartSurvey::Client do
       stub_get_responses(survey_id, 250)
       expect_any_instance_of(described_class).to receive(:sleep).twice
       client.list_responses(survey_id: survey_id)
+    end
+  end
+
+  describe "#delete_response" do
+    it "makes request with correct parameters" do
+      response_id = "987654321"
+      request = stub_delete_response(survey_id, response_id)
+
+      client.delete_response(survey_id: survey_id, response_id: response_id)
+
+      expect(request).to have_been_made
     end
   end
 end
