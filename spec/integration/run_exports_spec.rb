@@ -5,11 +5,15 @@ RSpec.describe "File export" do
     expect { example.run }.to output.to_stdout
   end
 
-  let!(:smart_survey_request) { stub_smart_survey_api }
+  let!(:smart_survey_request) do
+    survey_id = AskExport.config(:survey_id)
+    responses = ask_smart_survey_responses(50)
+    stub_get_responses(survey_id, responses).first
+  end
 
   it "fetches surveys and creates files for them" do
     dlp_client = stub_dlp_client
-    expect_deidentify_to_called(dlp_client, ["A question?"] * 50, ["A question?"] * 50)
+    expect_deidentify_to_called(dlp_client, [match(/Answer/)] * 50, ["A question?"] * 50)
 
     s3_client = stub_aws_s3_client
     stub_drive_authentication

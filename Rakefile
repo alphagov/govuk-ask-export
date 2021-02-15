@@ -19,3 +19,27 @@ task :run_exports do
 
   pipelines.each { |pipeline| pipeline.run(report_builder) }
 end
+
+desc "Delete old user data from Smart Survey"
+task :delete_data do
+  survey_id = AskExport.config(:survey_id)
+  client = SmartSurvey::Client.new
+
+  # Delete responses over 3 months old as per privacy agreement
+  p "Deleting responses over 3 months old"
+  old_responses = client.list_responses(survey_id: survey_id, until_time: 3.months.ago)
+
+  old_responses.each.with_index(1) do |response, index|
+    client.delete_response(survey_id: survey_id, response_id: response.id)
+    p "Deleted #{index} responses" if (index % 50).zero?
+  end
+
+  # Delete partial filled responses as they cannot be used
+  p "Deleting partially filled responses"
+  partial_responses = client.list_responses(survey_id: survey_id, completed: 0)
+
+  partial_responses.each.with_index(1) do |response, index|
+    client.delete_response(survey_id: survey_id, response_id: response.id)
+    p "Deleted #{index} responses" if (index % 50).zero?
+  end
+end
