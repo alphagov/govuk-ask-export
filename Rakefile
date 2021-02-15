@@ -26,16 +26,20 @@ task :delete_data do
   client = SmartSurvey::Client.new
 
   # Delete responses over 3 months old as per privacy agreement
+  p "Deleting responses over 3 months old"
   old_responses = client.list_responses(survey_id: survey_id, until_time: 3.months.ago)
 
-  old_responses.each do |response|
+  old_responses.each.with_index(1) do |response, index|
     client.delete_response(survey_id: survey_id, response_id: response.id)
+    p "Deleted #{index} responses" if (index % 50).zero?
   end
 
   # Delete partial filled responses as they cannot be used
+  p "Deleting partially filled responses"
   partial_responses = client.list_responses(survey_id: survey_id, completed: 0)
 
-  partial_responses.each do |response|
+  partial_responses.each.with_index(1) do |response, index|
     client.delete_response(survey_id: survey_id, response_id: response.id)
+    p "Deleted #{index} responses" if (index % 50).zero?
   end
 end
