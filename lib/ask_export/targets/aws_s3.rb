@@ -3,6 +3,11 @@ require "aws-sdk-s3"
 module AskExport
   module Targets
     class AwsS3
+      def self.bucket_name_from_env(name)
+        env_var_name = "S3_BUCKET_NAME_#{name.upcase.gsub(/-/, '_')}"
+        ENV[env_var_name]
+      end
+
       def initialize
         @client = Aws::S3::Client.new
       end
@@ -22,10 +27,7 @@ module AskExport
         puts "AWS S3 export: #{filename} uploaded to s3://#{bucket_name}"
       end
 
-      def self.bucket_name_from_env(name)
-        env_var_name = "S3_BUCKET_NAME_#{name.upcase.gsub(/-/, '_')}"
-        ENV[env_var_name]
-      end
+      def cleanup(name); end
     end
   end
 end

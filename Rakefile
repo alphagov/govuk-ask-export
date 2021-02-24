@@ -43,3 +43,11 @@ task :delete_data do
     p "Deleted #{index} responses" if (index % 50).zero?
   end
 end
+
+desc "Delete data for pipeline targets"
+task :run_cleanup do
+  config_path = File.expand_path("config/pipelines.yml", __dir__)
+  pipelines = AskExport::Pipeline.load_all(config_path)
+
+  pipelines.each(&:cleanup)
+end
