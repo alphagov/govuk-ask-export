@@ -69,4 +69,28 @@ RSpec.describe AskExport::Pipeline do
       expect(target_b).to have_received(:export).with("pipeline-a", "file-a.csv", "completed-data")
     end
   end
+
+  describe "#cleanup" do
+    let(:target_a) { spy("TargetA") }
+    let(:target_b) { spy("TargetB") }
+
+    before do
+      allow(AskExport::Targets).to receive(:find).with("target_a").and_return(target_a)
+      allow(AskExport::Targets).to receive(:find).with("target_b").and_return(target_b)
+    end
+
+    it "calls the correct export target" do
+      pipeline = AskExport::Pipeline.new(
+        name: "pipeline-a",
+        fields: %i[a b],
+        only_completed: true,
+        targets: %w[target_a target_b],
+      )
+
+      pipeline.cleanup
+
+      expect(target_a).to have_received(:cleanup).with("pipeline-a")
+      expect(target_b).to have_received(:cleanup).with("pipeline-a")
+    end
+  end
 end

@@ -15,6 +15,8 @@ module AskExport
           File.expand_path("../../../output", __dir__),
         )
       end
+
+      def cleanup; end
     end
   end
 end

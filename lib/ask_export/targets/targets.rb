@@ -18,5 +18,9 @@ module AskExport
         target
       end
     end
+
+    def self.clear_cache
+      @target_cache = {}
+    end
   end
 end

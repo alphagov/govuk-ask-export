@@ -15,6 +15,7 @@ RSpec.describe "File export" do
     dlp_client = stub_dlp_client
     expect_deidentify_to_called(dlp_client, [match(/Answer/)] * 50, ["A question?"] * 50)
 
+    AskExport::Targets.clear_cache
     s3_client = stub_aws_s3_client
     stub_drive_authentication
 

@@ -28,5 +28,13 @@ module AskExport
         target.export(name, filename, data)
       end
     end
+
+    def cleanup
+      targets.each do |target_name|
+        target = Targets.find(target_name)
+
+        target.cleanup(name)
+      end
+    end
   end
 end
