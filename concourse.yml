@@ -71,6 +71,7 @@ jobs:
                 set -e
                 bundle install --deployment
                 bundle exec rake run_exports
+                bundle exec rake run_cleanup
                 bundle exec rake delete_data
           params:
             SINCE_TIME: 00:00
