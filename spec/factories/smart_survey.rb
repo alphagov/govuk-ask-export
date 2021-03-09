@@ -63,11 +63,19 @@ FactoryBot.define do
     questions { [association(:question)] }
   end
 
+  factory :variable, class: OpenStruct do
+    sequence(:id, 1_000_000)
+    sequence(:name) { |n| "name-#{n}" }
+    sequence(:value) { |n| "value-#{n}" }
+    label { "" }
+  end
+
   factory :response, class: OpenStruct do
     sequence(:id, 100_000_000)
     date_started { "2020-02-09T18:38:05Z" }
     date_ended { "2020-02-09T18:42:04Z" }
     status { "completed" }
     pages { [association(:page)] }
+    variables { [association(:variable)] }
   end
 end

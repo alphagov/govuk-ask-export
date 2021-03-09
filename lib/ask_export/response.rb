@@ -2,12 +2,13 @@ require "smart_survey/response"
 
 module AskExport
   class Response < ::SmartSurvey::Response
-    attr_accessor :region, :question, :share_video, :name, :email, :phone
+    attr_accessor :event, :region, :question, :share_video, :name, :email, :phone
     alias_method :end_time, :ended
     alias_method :start_time, :started
 
     def initialize(**kwargs)
       super(kwargs)
+      @event = variables["event"]
       @region = fetch_answer(:region_field_id)
       @question = fetch_answer(:question_field_id)
       @share_video = fetch_answer(:share_video_field_id)

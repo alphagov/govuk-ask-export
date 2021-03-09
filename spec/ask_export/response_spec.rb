@@ -16,7 +16,12 @@ RSpec.describe AskExport::Response do
   describe "#new" do
     it "returns the initialize object with correct attributes" do
       response = described_class.new(
-        id: 1, status: "completed", started: started, ended: ended, answers: answers,
+        id: 1,
+        status: "completed",
+        started: started,
+        ended: ended,
+        answers: answers,
+        variables: { "event" => "disco" },
       )
 
       expect(response).to have_attributes(
@@ -32,32 +37,38 @@ RSpec.describe AskExport::Response do
         name: "Alex Doe",
         email: "test@example.com",
         phone: "123456789",
+        event: "disco",
       )
     end
   end
 
   describe "#status" do
+    let(:params) do
+      {
+        id: 1,
+        started: nil,
+        ended: nil,
+        answers: {},
+        variables: {},
+      }
+    end
+
     it "return submitted status if not completed" do
+      response = described_class.new(params.merge(status: "partial"))
+
+      expect(response.status).to eq("partial")
+    end
+
+    it "returns 'partial' when status is completed but some answers are missing" do
       response = described_class.new(
-        id: 1, status: "partial", started: nil, ended: nil, answers: {},
+        params.merge(status: "completed", answers: answers.merge(12_861_884 => nil)),
       )
 
       expect(response.status).to eq("partial")
     end
 
-    it "return 'partial' if completed but field missing" do
-      response = described_class.new(
-        id: 1, status: "completed", started: nil, ended: nil,
-        answers: answers.merge({ 12_861_884 => nil })
-      )
-
-      expect(response.status).to eq("partial")
-    end
-
-    it "return 'partial' if completed but field missing" do
-      response = described_class.new(
-        id: 1, status: "completed", started: nil, ended: nil, answers: answers,
-      )
+    it "returns 'completed' when status is completed and answers are present" do
+      response = described_class.new(params.merge(status: "completed", answers: answers))
 
       expect(response.status).to eq("completed")
     end
