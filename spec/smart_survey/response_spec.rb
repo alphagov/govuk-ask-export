@@ -90,21 +90,50 @@ RSpec.describe SmartSurvey::Response do
         )
       end
     end
+
+    context "when variables are in the payload" do
+      it "returns the object with a hash of variables" do
+        variable1 = hash(:variable, name: "event", value: "party")
+        variable2 = hash(:variable, name: "_gaId", value: "analytics")
+        raw_response = hash(:response, variables: [variable1, variable2])
+
+        response = described_class.parse(raw_response)
+        expect(response).to have_attributes(
+          variables: hash_including("event" => "party", "_gaId" => "analytics"),
+        )
+      end
+    end
+
+    context "when variables aren't provided in the payload" do
+      it "returns the object with empty variables" do
+        raw_response = hash(:response, variables: [])
+
+        response = described_class.parse(raw_response)
+        expect(response).to have_attributes(variables: {})
+      end
+    end
   end
 
   describe "#completed?" do
+    let(:params) do
+      {
+        id: nil,
+        status: "completed",
+        started: nil,
+        ended: nil,
+        answers: [],
+        variables: {},
+      }
+    end
+
     it "returns true if status is completed" do
-      response = described_class.new(
-        id: nil, status: "completed", started: nil, ended: nil, answers: [],
-      )
+      response = described_class.new(params.merge(status: "completed"))
 
       expect(response.completed?).to be(true)
     end
 
     it "returns true if status is partial" do
-      response = described_class.new(
-        id: nil, status: "partial", started: nil, ended: nil, answers: [],
-      )
+      response = described_class.new(params.merge(status: "partial"))
 
       expect(response.completed?).to be(false)
     end

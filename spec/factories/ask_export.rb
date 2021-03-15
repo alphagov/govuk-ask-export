@@ -25,6 +25,7 @@ FactoryBot.define do
           12_861_886 => email,
           12_861_885 => phone,
         },
+        variables: {},
       )
     end
   end
