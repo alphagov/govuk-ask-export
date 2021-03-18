@@ -1,6 +1,6 @@
 ---
 slack_settings: &slack_settings
-  channel: '#coronavirus-services-developer-only'
+  channel: '#govuk-corona-services-tech'
   username: GOV.UK Ask Export
   icon_emoji: ':concourse:'
   silent: true
