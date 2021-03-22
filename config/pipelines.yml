@@ -11,6 +11,7 @@ pipelines:
       - email
       - phone
       - share_video
+      - event
   third-party:
     targets:
       - google_drive
@@ -20,6 +21,7 @@ pipelines:
       - region
       - question
       - share_video
+      - event
   gcs-public-questions:
     targets:
       - aws_s3
