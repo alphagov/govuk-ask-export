@@ -30,3 +30,4 @@ pipelines:
       - end_time
       - region
       - question
+      - event
