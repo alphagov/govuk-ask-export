@@ -39,8 +39,8 @@ Install dependencies with `bundle install`
 
 The exports are configured in
 [`config/pipelines.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines.yml).
-Each pipeline represents a version of the CSV data being generated. Pipeline
-configured to export specific data fields or CSV columns listed under `fields`
+Each pipeline represents a version of the CSV data being generated. Pipelines
+are configured to export specific data fields or CSV columns listed under `fields`
 attribute. Each pipeline can specify zero or more export targets under the
 `targets` attribute. These are the names of the locations to which the file
 should be exported to.
