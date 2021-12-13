@@ -9,9 +9,11 @@ used for the https://www.gov.uk/ask service. This does the following:
 - exports the CSV file to specified targets including to the local filesystem,
   a Google Drive folder or an AWS S3 bucket
 
-A concourse pipeline has been configured to run daily, to export the previous
+A [Jenkins job][] has been configured to run daily, to export the previous
 day's smart survey data. However, this project can also be run manually on your
 local machine if needed.
+
+[Jenkins job]: https://github.com/alphagov/govuk-puppet/blob/main/modules/govuk_jenkins/templates/jobs/ask_export.yaml.erb
 
 ## Dependencies
 
@@ -36,12 +38,12 @@ Install dependencies with `bundle install`
 ### Configure the exports
 
 The exports are configured in
-[`config/pipelines.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines.yml)
-(not to be confused with concourse pipelines). Each pipeline represents a
-version of the CSV data being generated. Pipeline configured to export specific
-data fields or CSV columns listed under `fields` attribute. Each pipeline can
-specify zero or more export targets under the `targets` attribute. These are
-the names of the locations to which the file should be exported to.
+[`config/pipelines.yml`](https://github.com/alphagov/govuk-ask-export/blob/master/config/pipelines.yml).
+Each pipeline represents a version of the CSV data being generated. Pipeline
+configured to export specific data fields or CSV columns listed under `fields`
+attribute. Each pipeline can specify zero or more export targets under the
+`targets` attribute. These are the names of the locations to which the file
+should be exported to.
 
 ### Set the environment variables
 
