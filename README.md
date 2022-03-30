@@ -121,6 +121,6 @@ bundle exec rake
 
 This will lint and test the code.
 
-## Licence
+## License
 
-[MIT License](LICENCE)
+[MIT License](LICENSE)
