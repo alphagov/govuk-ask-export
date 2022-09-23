@@ -56,10 +56,6 @@ The following environment variables should be configured:
 | SMART_SURVEY_API_TOKEN_SECRET  | Credentials found in Smart Survey, under Account > API Keys. (Required)                                                                                                                                                                |
 | SINCE_TIME                     | Retrieve responses submitted after this time. Can be set as a time (e.g. "13:00") for the previous day or can be set as a datetime (e.g. "2020-05-01 10:00") to specify the date. Default is "10:00".                        |
 | UNTIL_TIME                     | Retrieve responses submitted before this time. Can be set as a time (e.g. "13:00") for the current day or can be set as a datetime (e.g. "2020-05-01 16:00") to specify the date. Default is "10:00".                        |
-| AWS_REGION                     | The AWS Region where the export S3 buckets are located. Currently does not support multiple buckets in different regions.                                                                                                              |
-| AWS_ACCESS_KEY_ID              | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
-| AWS_SECRET_ACCESS_KEY          | AWS credentials with permissions to putObject to the export S3 buckets.                                                                                                                                                                |
-| S3_BUCKET_NAME_<PIPELINE_NAME> | Each pipeline with an export target `aws_s3` requires an environment variable to be set. This specifies the name of the AWS S3 bucket to export to for that pipeline. E.g. `cabinet-office` needs `S3_BUCKET_NAME_CABINET_OFFICE` set. |
 | FOLDER_ID_<PIPELINE_NAME>      | Each pipeline with an export target `google_drive` requires an environment variable to be set. This specifies the Google Drive folder to export to for that pipeline. E.g. `cabinet-office` needs `FOLDER_ID_CABINET_OFFICE` set.      |
 | GOOGLE_CLOUD_PROJECT           | The GCP project name which has the billing and DLP API enabled.                                                                                                                                                                        |
 | GOOGLE_ACCOUNT_TYPE            | The account type for the credentials used by Google APIs. This should be `service_account`.                                                                                                                                            |
@@ -88,10 +84,6 @@ GOOGLE_PRIVATE_KEY=<google-private-key> \
 GOOGLE_CLOUD_PROJECT=<google-cloud-project> \
 FOLDER_ID_CABINET_OFFICE=<google-drive-folder-id-cabinet-office> \
 FOLDER_ID_THIRD_PARTY=<google-drive-folder-id-third-party> \
-AWS_REGION=<aws-region> \
-AWS_ACCESS_KEY_ID=<aws-access-key-id> \
-AWS_SECRET_ACCESS_KEY=<aws-secret-access-key> \
-S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS=<aws-s3-bucket-name-gcs-public-questions> \
 bundle exec rake run_exports
 ```
 
