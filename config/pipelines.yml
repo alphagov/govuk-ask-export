@@ -22,9 +22,6 @@ pipelines:
       - question
       - share_video
       - event
-  gcs-public-questions:
-    targets:
-      - aws_s3
     only_completed: true
     fields:
       - end_time
