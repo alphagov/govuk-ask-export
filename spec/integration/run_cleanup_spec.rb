@@ -4,7 +4,6 @@ RSpec.describe "Clean up export targets" do
   end
 
   it "fetches surveys and creates files for them" do
-    stub_aws_s3_client
     stub_drive_authentication
 
     co_files = [
