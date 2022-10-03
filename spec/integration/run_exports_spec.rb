@@ -16,13 +16,11 @@ RSpec.describe "File export" do
     expect_deidentify_to_called(dlp_client, [match(/Answer/)] * 50, ["A question?"] * 50)
 
     AskExport::Targets.clear_cache
-    s3_client = stub_aws_s3_client
     stub_drive_authentication
 
     expected_exports = {
       filesystem: [],
       google_drive: %w[cabinet-office third-party],
-      aws_s3: %w[gcs-public-questions],
     }
 
     google_drive_stubs = expected_exports[:google_drive].map do |recipient|
@@ -38,8 +36,7 @@ RSpec.describe "File export" do
                             UNTIL_TIME: "2020-05-07 11:00",
                             GOOGLE_CLOUD_PROJECT: "project-name",
                             FOLDER_ID_CABINET_OFFICE: "cabinet-office-folder-id",
-                            FOLDER_ID_THIRD_PARTY: "third-party-folder-id",
-                            S3_BUCKET_NAME_GCS_PUBLIC_QUESTIONS: "bucket-name") do
+                            FOLDER_ID_THIRD_PARTY: "third-party-folder-id") do
         Rake::Task["run_exports"].invoke
       end
 
@@ -50,21 +47,6 @@ RSpec.describe "File export" do
       end
 
       google_drive_stubs.each { |stub| expect(stub).to have_been_requested }
-
-      expect(s3_client.api_requests.size).to eq(expected_exports[:aws_s3].count)
-
-      aws_requests = s3_client.api_requests.map { |r| r[:params] }
-
-      expected_aws_requests = expected_exports[:aws_s3].map do |recipient|
-        include(
-          body: be_a(StringIO),
-          bucket: "bucket-name",
-          key: "2020-05-06-2000-to-2020-05-07-1100-#{recipient}.csv",
-          server_side_encryption: "AES256",
-        )
-      end
-
-      expect(aws_requests).to include(*expected_aws_requests)
     end
   end
 end

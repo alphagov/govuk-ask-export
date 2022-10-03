@@ -1,7 +1,6 @@
 module AskExport
   module Targets
     ALL = {
-      "aws_s3" => AwsS3,
       "google_drive" => GoogleDrive,
       "filesystem" => Filesystem,
     }.freeze
