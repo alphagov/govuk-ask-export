@@ -17,6 +17,7 @@ module SmartSurvey
           retry_statuses: [401, 409, 408, 429, 500, 501, 502, 503, 504],
         }
 
+        f.request(:basic_auth, credentials[:api_token], credentials[:api_token_secret])
         f.request(:retry, retry_options)
         f.response(:raise_error)
       end
