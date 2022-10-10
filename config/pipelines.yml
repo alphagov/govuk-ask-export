@@ -22,9 +22,3 @@ pipelines:
       - question
       - share_video
       - event
-    only_completed: true
-    fields:
-      - end_time
-      - region
-      - question
-      - event
