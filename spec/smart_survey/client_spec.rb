@@ -18,7 +18,7 @@ RSpec.describe SmartSurvey::Client do
     it "make the requests with correct parameters" do
       responses = smart_survey_responses(200)
       requests = stub_get_responses(
-        survey_id, responses, since_time: since_time, until_time: until_time
+        survey_id, responses, "Og==", { since_time: since_time, until_time: until_time }
       )
 
       client.list_responses(
@@ -29,7 +29,7 @@ RSpec.describe SmartSurvey::Client do
     end
 
     it "returns an array of responses" do
-      stub_get_responses(survey_id, smart_survey_responses(2))
+      stub_get_responses(survey_id, smart_survey_responses(2), "Og==")
       responses = client.list_responses(survey_id: survey_id)
 
       expect(responses).to contain_exactly(
@@ -39,14 +39,14 @@ RSpec.describe SmartSurvey::Client do
     end
 
     it "can retreive more responses than maximum page size of 100" do
-      stub_get_responses(survey_id, smart_survey_responses(250))
+      stub_get_responses(survey_id, smart_survey_responses(250), "Og==")
       responses = client.list_responses(survey_id: survey_id)
 
       expect(responses.count).to eq(250)
     end
 
     it "sleeps between each request" do
-      stub_get_responses(survey_id, smart_survey_responses(250))
+      stub_get_responses(survey_id, smart_survey_responses(250), "Og==")
 
       expect_any_instance_of(described_class).to receive(:sleep).twice
       client.list_responses(survey_id: survey_id)
@@ -56,7 +56,7 @@ RSpec.describe SmartSurvey::Client do
   describe "#delete_response" do
     it "makes request with correct parameters" do
       response_id = "987654321"
-      request = stub_delete_response(survey_id, response_id)
+      request = stub_delete_response(survey_id, response_id, "Og==")
 
       client.delete_response(survey_id: survey_id, response_id: response_id)
 

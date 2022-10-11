@@ -1,12 +1,16 @@
 module SmartSurveyHelper
-  def stub_get_responses(survey_id, responses, options = {})
+  def stub_get_responses(survey_id, responses, auth, options = {})
     url = "https://api.smartsurvey.io/v1/surveys/#{survey_id}/responses"
 
     query = {
       since: options[:since_time]&.to_i&.to_s,
       until: options[:until_time]&.to_i&.to_s,
-      completed: options[:completed],
-    }.merge(auth_parameters).compact
+      completed: options[:completed]&.to_i&.to_s || "2",
+      page_size: options[:page_size]&.to_i&.to_s || "100",
+      page: options[:page]&.to_i&.to_s || "1",
+      sort_by: options[:sort_by] || "date_ended,asc",
+      include_labels: options[:include_labels] || "true",
+    }.compact
 
     max_page_size = options.fetch(:page_size, 100)
     page = 1
@@ -18,7 +22,10 @@ module SmartSurveyHelper
       body = JSON.generate(responses[0..(page_size - 1)])
 
       requests << stub_request(:get, url)
-        .with(query: hash_including(query.merge({ page: page.to_s })))
+        .with(
+          query: hash_including(query.merge({ page: page.to_s })),
+          headers: { "Authorization" => "Basic #{auth}" },
+        )
         .to_return(body: body, status: 200)
 
       page += 1
@@ -30,7 +37,7 @@ module SmartSurveyHelper
     requests
   end
 
-  def stub_delete_response(survey_id, response_id)
+  def stub_delete_response(survey_id, response_id, auth)
     url = "https://api.smartsurvey.io/v1/surveys/#{survey_id}/responses/#{response_id}"
 
     body = "{
@@ -40,15 +47,8 @@ module SmartSurveyHelper
     }"
 
     stub_request(:delete, url)
-      .with(query: hash_including(auth_parameters))
+      .with(headers: { "Authorization" => "Basic #{auth}" })
       .to_return(body: body, status: 200)
-  end
-
-  def auth_parameters
-    {
-      "api_token" => anything,
-      "api_token_secret" => anything,
-    }
   end
 
   def smart_survey_responses(count, options = {})

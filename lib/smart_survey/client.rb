@@ -7,8 +7,7 @@ module SmartSurvey
     PAGE_SIZE = 100
 
     def initialize
-      credentials = { api_token: api_token, api_token_secret: api_token_secret }
-      @conn = Faraday.new(BASE_URL, params: credentials) do |f|
+      @conn = Faraday.new(BASE_URL) do |f|
         retry_options = {
           max: 3,
           interval: 1,
@@ -17,7 +16,7 @@ module SmartSurvey
           retry_statuses: [401, 409, 408, 429, 500, 501, 502, 503, 504],
         }
 
-        f.request(:basic_auth, credentials[:api_token], credentials[:api_token_secret])
+        f.request(:basic_auth, api_token, api_token_secret)
         f.request(:retry, retry_options)
         f.response(:raise_error)
       end
