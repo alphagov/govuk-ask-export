@@ -11,17 +11,17 @@ RSpec.describe "Delete data" do
     )
 
     old_responses_requests = stub_get_responses(
-      survey_id, old_responses.dup, { until_time: 3.months.ago }
+      survey_id, old_responses.dup, "dG9rZW46dG9rZW4=", { until_time: 3.months.ago }
     )
 
     partial_responses = ask_smart_survey_responses(2, { status: "partial" })
 
     partial_responses_requests = stub_get_responses(
-      survey_id, partial_responses.dup, { completed: "0" }
+      survey_id, partial_responses.dup, "dG9rZW46dG9rZW4=", { completed: "0" }
     )
 
     delete_requests = (old_responses + partial_responses).map do |response|
-      stub_delete_response(survey_id, response[:id])
+      stub_delete_response(survey_id, response[:id], "dG9rZW46dG9rZW4=")
     end
 
     ClimateControl.modify(SMART_SURVEY_API_TOKEN: "token",
