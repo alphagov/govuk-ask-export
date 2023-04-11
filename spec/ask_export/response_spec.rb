@@ -18,9 +18,9 @@ RSpec.describe AskExport::Response do
       response = described_class.new(
         id: 1,
         status: "completed",
-        started: started,
-        ended: ended,
-        answers: answers,
+        started:,
+        ended:,
+        answers:,
         variables: { "event" => "disco" },
       )
 
@@ -29,8 +29,8 @@ RSpec.describe AskExport::Response do
         status: "completed",
         start_time: started,
         end_time: ended,
-        started: started,
-        ended: ended,
+        started:,
+        ended:,
         region: "England",
         question: "Question?",
         share_video: "Yes",
@@ -68,7 +68,7 @@ RSpec.describe AskExport::Response do
     end
 
     it "returns 'completed' when status is completed and answers are present" do
-      response = described_class.new(params.merge(status: "completed", answers: answers))
+      response = described_class.new(params.merge(status: "completed", answers:))
 
       expect(response.status).to eq("completed")
     end

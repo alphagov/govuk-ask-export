@@ -13,8 +13,8 @@ FactoryBot.define do
 
     initialize_with do
       new(
-        id: id,
-        status: status,
+        id:,
+        status:,
         started: start_time,
         ended: end_time,
         answers: {

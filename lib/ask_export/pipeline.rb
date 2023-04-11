@@ -5,7 +5,7 @@ module AskExport
     def self.load_all(config_path)
       pipelines = YAML.load_file(config_path).fetch("pipelines")
       pipelines.map do |name, config|
-        new(name: name, **config.transform_keys(&:to_sym))
+        new(name:, **config.transform_keys(&:to_sym))
       end
     end
 
@@ -17,7 +17,7 @@ module AskExport
     end
 
     def run(report_builder)
-      report = report_builder.build(only_completed: only_completed)
+      report = report_builder.build(only_completed:)
 
       filename = report.filename(name, "csv")
       data = report.to_csv(fields)

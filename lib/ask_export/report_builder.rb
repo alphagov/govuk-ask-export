@@ -16,10 +16,10 @@ module AskExport
       @responses ||= begin
         survey_id = AskExport.config(:survey_id)
         raw_responses = SmartSurvey::Client.new.list_responses(
-          survey_id: survey_id,
+          survey_id:,
           response_class: AskExport::Response,
-          since_time: since_time,
-          until_time: until_time,
+          since_time:,
+          until_time:,
         )
 
         post_process(raw_responses)

@@ -26,7 +26,7 @@ module SmartSurveyHelper
           query: hash_including(query.merge({ page: page.to_s })),
           headers: { "Authorization" => "Basic #{auth}" },
         )
-        .to_return(body: body, status: 200)
+        .to_return(body:, status: 200)
 
       page += 1
       responses.shift(page_size)
@@ -48,7 +48,7 @@ module SmartSurveyHelper
 
     stub_request(:delete, url)
       .with(headers: { "Authorization" => "Basic #{auth}" })
-      .to_return(body: body, status: 200)
+      .to_return(body:, status: 200)
   end
 
   def smart_survey_responses(count, options = {})

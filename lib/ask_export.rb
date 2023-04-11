@@ -7,22 +7,22 @@ Dir.glob(File.join(__dir__, "ask_export/**/*.rb")).sort.each { |file| require fi
 module AskExport
   CONFIG = {
     draft: {
-      survey_id: 849813,
-      region_field_id: 12861884,
-      question_field_id: 12861887,
-      share_video_field_id: 12861888,
-      name_field_id: 12861883,
-      email_field_id: 12861886,
-      phone_field_id: 12861885,
+      survey_id: 849_813,
+      region_field_id: 12_861_884,
+      question_field_id: 12_861_887,
+      share_video_field_id: 12_861_888,
+      name_field_id: 12_861_883,
+      email_field_id: 12_861_886,
+      phone_field_id: 12_861_885,
     },
     live: {
-      survey_id: 845945,
-      region_field_id: 12808286,
-      question_field_id: 12808290,
-      share_video_field_id: 12808730,
-      name_field_id: 12808285,
-      email_field_id: 12808288,
-      phone_field_id: 12808287,
+      survey_id: 845_945,
+      region_field_id: 12_808_286,
+      question_field_id: 12_808_290,
+      share_video_field_id: 12_808_730,
+      name_field_id: 12_808_285,
+      email_field_id: 12_808_288,
+      phone_field_id: 12_808_287,
     },
   }.freeze
 

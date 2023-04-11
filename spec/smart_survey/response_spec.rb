@@ -15,8 +15,8 @@ RSpec.describe SmartSurvey::Response do
       expect(response).to have_attributes(
         id: response_id,
         status: "completed",
-        started: started,
-        ended: ended,
+        started:,
+        ended:,
       )
     end
 
@@ -34,7 +34,7 @@ RSpec.describe SmartSurvey::Response do
         question = hash(:question, :text)
         pages = [hash(:page, questions: [question])]
 
-        raw_response = hash(:response, pages: pages)
+        raw_response = hash(:response, pages:)
 
         response = described_class.parse(raw_response)
         expect(response).to have_attributes(

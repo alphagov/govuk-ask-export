@@ -68,7 +68,7 @@ module SmartSurvey
         page = 1
 
         loop do
-          response = @conn.get(path, params.merge(page: page))
+          response = @conn.get(path, params.merge(page:))
           data = JSON.parse(response.body, symbolize_names: true)
           y.yield data
 

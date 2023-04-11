@@ -16,8 +16,8 @@ module SmartSurvey
         status: response[:status],
         started: Time.zone.iso8601(response[:date_started]),
         ended: Time.zone.iso8601(response[:date_ended]),
-        answers: answers,
-        variables: variables,
+        answers:,
+        variables:,
       )
     end
 
