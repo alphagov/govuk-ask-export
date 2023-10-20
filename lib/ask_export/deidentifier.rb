@@ -115,8 +115,7 @@ module AskExport
     def regex_removal(text)
       text = text.gsub(/(?i)nhs\s?(?:.{0,20})?(?:\d\D?){9}(?:\d)/, "NHS_NUMBER")
       text = text.gsub(/(?i)\b(?:[a-z]\W?){2}(?:\d\W?){6}\W?[a-z]\b/, "NI_NUMBER")
-      text = text.gsub(/(?:\d\D?){16}/, "CREDIT_CARD_NUMBER")
-      text
+      text.gsub(/(?:\d\D?){16}/, "CREDIT_CARD_NUMBER")
     end
   end
 end
