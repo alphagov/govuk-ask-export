@@ -16,7 +16,7 @@ GEM
       rexml
     declarative (0.0.20)
     diff-lcs (1.5.0)
-    factory_bot (6.1.0)
+    factory_bot (6.4.5)
       activesupport (>= 5.0.0)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
