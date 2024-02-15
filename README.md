@@ -1,5 +1,7 @@
 # GOV.UK Ask Export
 
+**Archived - This tool has not been running since Jenkins was retired**
+
 A tool for exporting the user responses and metadata from Smart Survey which is
 used for the https://www.gov.uk/ask service. This does the following:
 
